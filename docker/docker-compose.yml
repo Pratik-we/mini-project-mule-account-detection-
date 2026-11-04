@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # ========================================================
+  # Apache Kafka (KRaft mode: No ZooKeeper needed)
+  # ========================================================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: upi-kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Kafka Topics Creator
+  init-kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic upi.transactions.raw --partitions 3 --replication-factor 1
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic upi.fraud.alerts --partitions 3 --replication-factor 1
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic upi.mule.chains --partitions 3 --replication-factor 1
+      echo 'Kafka topics initialized.'
+      "
+
+  # ========================================================
+  # Apache Flink 1.17 Cluster
+  # ========================================================
+  jobmanager:
+    image: flink:1.17.2-scala_2.12-java11
+    container_name: upi-flink-jobmanager
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.port: 8081
+    volumes:
+      - ../flink-jobs:/opt/flink-jobs
+      - ../config/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+
+  taskmanager:
+    image: flink:1.17.2-scala_2.12-java11
+    container_name: upi-flink-taskmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 4
+    volumes:
+      - ../flink-jobs:/opt/flink-jobs
+      - ../config/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+
+  # ========================================================
+  # ClickHouse Columnar OLAP Database
+  # ========================================================
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: upi-clickhouse
+    ports:
+      - "8123:8123" # HTTP client & REST API
+      - "9000:9000" # Native TCP client
+    volumes:
+      - ../clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - clickhouse-data:/var/lib/clickhouse/
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+volumes:
+  clickhouse-data:
+

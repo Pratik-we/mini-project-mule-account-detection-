@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>UPI Fraud & Mule Stream Sentinel - SOC Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-group">
+      <h1>🛡️ RippleGuard <span class="live-indicator">● LIVE STREAM</span></h1>
+      <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
+        Real-Time Distributed Money Mule & UPI Payment Fraud Detection Engine
+      </p>
+    </div>
+    <button class="btn-trigger" onclick="injectMuleAttack()">🚨 Inject Mule Ring Attack</button>
+  </header>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <h3>Total Transactions Streamed</h3>
+      <div class="num" id="stat-tx">0</div>
+    </div>
+    <div class="metric-card">
+      <h3>Flagged Mule Alerts</h3>
+      <div class="num" style="color: var(--accent-red);" id="stat-alerts">0</div>
+    </div>
+    <div class="metric-card">
+      <h3>Critical Velocity Drains (&lt;15s)</h3>
+      <div class="num" style="color: var(--accent-orange);" id="stat-crit">0</div>
+    </div>
+    <div class="metric-card">
+      <h3>Active Mules Under Watch</h3>
+      <div class="num" style="color: var(--accent-purple);" id="stat-mules">0</div>
+    </div>
+  </div>
+
+  <div class="layout-grid">
+    <!-- Left Column: Real-Time Fraud & Mule Ring Alerts -->
+    <div class="panel">
+      <div class="panel-title">
+        <span>🚨 Real-Time Mule Ring & Rapid-Drain Alerts</span>
+        <span style="font-size: 12px; color: var(--text-dim); font-weight: normal;">Sub-Second Flink Stateful CEP</span>
+      </div>
+      <div class="feed-list" id="alerts-feed">
+        <div style="color: var(--text-dim); font-size: 13px; padding: 12px 0;">
+          Monitoring live UPI stream for suspicious rapid pass-throughs, multi-hop chains, and smurfing...
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Live UPI Transaction Feed -->
+    <div class="panel">
+      <div class="panel-title">
+        <span>📡 Live Keyed Transaction Feed</span>
+        <span style="font-size: 12px; color: var(--text-dim); font-weight: normal;">Kafka Topic:
+          upi.transactions.raw</span>
+      </div>
+      <div class="feed-list" id="tx-feed"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
