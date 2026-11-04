@@ -1,174 +1,211 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="UTF-8">
-  <title>RippleGuard // UPI Money Mule Stream Sentinel - SOC Command Center</title>
+  <title>Sentinel | Real-Time UPI Money Mule & Fraud Detection Engine</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 
 <body>
 
-  <!-- Top System Header -->
-  <header class="soc-header">
-    <div class="brand-section">
-      <div class="logo-shield">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Enterprise Top Navigation Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           <path d="m9 12 2 2 4-4"></path>
         </svg>
-        <span class="shield-pulse"></span>
       </div>
-      <div class="brand-text">
-        <div class="brand-title">
-          <span class="title-main">RIPPLEGUARD</span>
-          <span class="version-tag">SOC v3.4</span>
+      <div class="brand-info">
+        <div class="brand-title-row">
+          <span class="brand-name">FRAUD DETECTION</span>
+          <span class="brand-badge">Financial Fraud Intelligence</span>
         </div>
-        <div class="brand-subtitle">
-          Real-Time UPI Payment Fraud & Distributed Money Mule Stream Sentinel
-        </div>
+        <span class="brand-sub">Real-Time Money Mule & Rapid Velocity Detection</span>
       </div>
     </div>
 
-    <!-- System Telemetry Indicators -->
-    <div class="system-status-pills">
-      <div class="status-pill status-active">
-        <span class="pulse-dot"></span>
-        <span>STREAM: ACTIVE</span>
+    <!-- Live System Telemetry -->
+    <div class="header-center">
+      <div class="status-indicator">
+        <span class="status-dot pulse"></span>
+        <span class="status-label">Stream Live</span>
       </div>
-      <div class="status-pill status-tech">
-        <span>⚡ FLINK CEP: STATEFUL</span>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Engine:</span>
+        <span class="telemetry-val">Flink CEP In-Memory</span>
       </div>
-      <div class="status-pill status-tech">
-        <span>🛡️ UPI SWITCH: LIVE</span>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Source:</span>
+        <span class="telemetry-val">UPI Gateway (9K+ Rows)</span>
       </div>
     </div>
 
-    <!-- Clock & Primary Actions -->
-    <div class="header-actions">
-      <div class="live-clock" id="live-clock">--:--:-- IST</div>
-      <button class="btn-pause" id="btn-pause" onclick="togglePauseStream()">
-        <span id="pause-icon">⏸</span> <span id="pause-label">Pause Stream</span>
+    <!-- Actions & Theme Toggle -->
+    <div class="header-right">
+      <div class="clock-display" id="live-clock">--:--:-- IST</div>
+
+      <!-- Stream Control Button -->
+      <button class="btn btn-secondary btn-sm" id="btn-pause" onclick="togglePauseStream()" title="Pause live transaction intake">
+        <span id="pause-icon">⏸</span>
+        <span id="pause-label">Pause</span>
       </button>
-      <button class="btn-attack" onclick="injectMuleAttack()">
-        <span class="radar-ping"></span>
-        <span class="btn-text">🚨 Inject Mule Attack</span>
+
+      <!-- Simulate Attack Trigger -->
+      <button class="btn btn-danger btn-sm" onclick="injectMuleAttack()" title="Inject synthetic coordinated money mule attack">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span>Simulate Attack</span>
+      </button>
+
+      <!-- Theme Switcher Button -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light / Dark mode" aria-label="Toggle Theme">
+        <span class="theme-icon light-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </span>
+        <span class="theme-icon dark-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </span>
+        <span class="theme-label" id="theme-label">Dark</span>
       </button>
     </div>
   </header>
 
-  <!-- High-Density SOC Metrics Bar -->
-  <section class="metrics-container">
-    <div class="metric-box">
-      <div class="metric-top">
-        <span class="metric-label">TOTAL TRANSACTIONS</span>
-        <span class="metric-tag tag-blue">Keyed Inflow</span>
+  <!-- Executive KPI Metrics Overview -->
+  <section class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-header">
+        <span class="metric-title">Total Transactions</span>
+        <span class="metric-badge neutral">Live Stream</span>
       </div>
-      <div class="metric-val" id="stat-tx">0</div>
-      <div class="metric-foot" id="stat-vol">Total Vol: ₹0</div>
+      <div class="metric-value" id="stat-tx">0</div>
+      <div class="metric-sub" id="stat-vol">Total Vol: ₹0</div>
     </div>
 
-    <div class="metric-box">
-      <div class="metric-top">
-        <span class="metric-label">MULE ALERTS FLAGGED</span>
-        <span class="metric-tag tag-red">Risk &gt; 70</span>
+    <div class="metric-card danger-card">
+      <div class="metric-header">
+        <span class="metric-title">Flagged Mule Incidents</span>
+        <span class="metric-badge danger">High Confidence</span>
       </div>
-      <div class="metric-val color-red" id="stat-alerts">0</div>
-      <div class="metric-foot">High-Confidence CEP Triggers</div>
+      <div class="metric-value danger-text" id="stat-alerts">0</div>
+      <div class="metric-sub">CEP Pattern Detections</div>
     </div>
 
-    <div class="metric-box">
-      <div class="metric-top">
-        <span class="metric-label">CRITICAL VELOCITY DRAINS</span>
-        <span class="metric-tag tag-orange">&lt; 15s Window</span>
+    <div class="metric-card warning-card">
+      <div class="metric-header">
+        <span class="metric-title">Critical Velocity Drains</span>
+        <span class="metric-badge warning">&le; 15s Window</span>
       </div>
-      <div class="metric-val color-orange" id="stat-crit">0</div>
-      <div class="metric-foot">Sub-Second Inter-Bank Hops</div>
+      <div class="metric-value warning-text" id="stat-crit">0</div>
+      <div class="metric-sub">Rapid In-and-Out Hops</div>
     </div>
 
-    <div class="metric-box">
-      <div class="metric-top">
-        <span class="metric-label">ACTIVE MULES IDENTIFIED</span>
-        <span class="metric-tag tag-purple">Quarantined</span>
+    <div class="metric-card purple-card">
+      <div class="metric-header">
+        <span class="metric-title">Under Surveillance</span>
+        <span class="metric-badge purple">Identified Mules</span>
       </div>
-      <div class="metric-val color-purple" id="stat-mules">0</div>
-      <div class="metric-foot">Under Surveillance Radar</div>
+      <div class="metric-value purple-text" id="stat-mules">0</div>
+      <div class="metric-sub">Unique Suspicious Accounts</div>
     </div>
 
-    <div class="metric-box">
-      <div class="metric-top">
-        <span class="metric-label">STREAM THROUGHPUT</span>
-        <span class="metric-tag tag-green">Healthy</span>
+    <div class="metric-card success-card">
+      <div class="metric-header">
+        <span class="metric-title">Stream Ingestion Rate</span>
+        <span class="metric-badge success">Operational</span>
       </div>
-      <div class="metric-val color-green" id="stat-tps">2.2 /s</div>
-      <div class="metric-foot">Avg CEP Latency: &lt; 5 ms</div>
+      <div class="metric-value success-text" id="stat-tps">2.2 /s</div>
+      <div class="metric-sub">Processing Latency &lt; 5ms</div>
     </div>
   </section>
 
-  <!-- Main Grid Workspace -->
-  <main class="soc-grid">
-    <!-- Left Panel: Real-Time Fraud & Money Mule Detection Radar -->
-    <section class="soc-panel alerts-panel">
+  <!-- Main Split Console Area -->
+  <main class="console-layout">
+    
+    <!-- Left Workspace: Mule Risk & Pattern Alerts -->
+    <section class="console-panel alerts-section">
       <div class="panel-header">
-        <div class="panel-headline">
-          <div class="title-with-badge">
-            <h2>🚨 Real-Time Mule Network &amp; Rapid-Drain Alerts</h2>
-            <span class="panel-count-badge" id="alerts-count-badge">0 ALERTS</span>
+        <div class="panel-title-block">
+          <div class="panel-title-row">
+            <h2>Real-Time Mule Network &amp; Rapid-Drain Alerts</h2>
+            <span class="counter-badge" id="alerts-count-badge">0 Alerts</span>
           </div>
-          <p class="panel-caption">Automated Sub-Second Detection of Pass-Through Mules, Smurfing, and Laundering Layering</p>
+          <p class="panel-description">Stateful tracking of rapid pass-through layering and fan-in smurfing aggregators</p>
         </div>
-        
-        <!-- Filter Pills -->
-        <div class="filter-group">
-          <button class="filter-btn active" onclick="setAlertFilter('all', this)">All</button>
-          <button class="filter-btn" onclick="setAlertFilter('CRITICAL', this)">Critical (&lt;15s)</button>
-          <button class="filter-btn" onclick="setAlertFilter('RAPID_PASS_THROUGH_MULE', this)">Pass-Through</button>
-          <button class="filter-btn" onclick="setAlertFilter('FAN_IN_SMURFING_AGGREGATOR', this)">Smurfing</button>
+
+        <!-- Filter Tabs / Segmented Control -->
+        <div class="segmented-control" role="tablist">
+          <button class="seg-btn active" onclick="setAlertFilter('all', this)">All</button>
+          <button class="seg-btn" onclick="setAlertFilter('CRITICAL', this)">Critical (&le;15s)</button>
+          <button class="seg-btn" onclick="setAlertFilter('RAPID_PASS_THROUGH_MULE', this)">Pass-Through</button>
+          <button class="seg-btn" onclick="setAlertFilter('FAN_IN_SMURFING_AGGREGATOR', this)">Smurfing</button>
         </div>
       </div>
 
-      <div class="alerts-stream-container" id="alerts-feed">
-        <div class="empty-state" id="alerts-placeholder">
-          <div class="scanner-ring"></div>
-          <div class="empty-title">Sentinel Radar Active</div>
-          <div class="empty-desc">Evaluating live UPI transactions across sliding state windows for time-to-drain anomalies...</div>
+      <div class="panel-body alerts-scroll-area" id="alerts-feed">
+        <div class="empty-placeholder" id="alerts-placeholder">
+          <div class="placeholder-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <div class="placeholder-title">Sentinel Radar Monitoring Active</div>
+          <p class="placeholder-text">Analyzing transaction velocity, sender-receiver graph, and time-to-drain thresholds. Detections will appear here in real time.</p>
         </div>
       </div>
     </section>
 
-    <!-- Right Panel: Live UPI Keyed Transaction Feed -->
-    <section class="soc-panel tx-panel">
+    <!-- Right Workspace: Live Transaction Stream Ledger -->
+    <section class="console-panel ledger-section">
       <div class="panel-header">
-        <div class="panel-headline">
-          <div class="title-with-badge">
-            <h2>📡 Live UPI Payment Stream</h2>
-            <span class="panel-count-badge tag-blue">Kafka: upi.transactions.raw</span>
+        <div class="panel-title-block">
+          <div class="panel-title-row">
+            <h2>Live UPI Transaction Feed</h2>
+            <span class="feed-tag">Ingesting Dataset</span>
           </div>
-          <p class="panel-caption">Live Ingestion from <code class="code-tag">data/transactions.csv</code> (9,000+ Transactions)</p>
+          <p class="panel-description">Continuous event stream from <code>data/transactions.csv</code></p>
         </div>
 
-        <!-- Search Bar -->
-        <div class="tx-search-bar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Clean Search Box -->
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="tx-search" placeholder="Filter by VPA, Bank, City..." oninput="onTxSearch(this.value)">
+          <input type="text" id="tx-search" placeholder="Search VPA, Bank, City..." oninput="onTxSearch(this.value)" autocomplete="off">
         </div>
       </div>
 
-      <div class="tx-stream-container" id="tx-feed"></div>
+      <div class="panel-body ledger-scroll-area" id="tx-feed"></div>
     </section>
+
   </main>
 
-  <!-- Notification Toast -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- Clean Floating Toast Container -->
+  <div class="toast-wrapper" id="toast-container"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 
 </html>

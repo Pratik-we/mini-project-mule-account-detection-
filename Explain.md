@@ -198,9 +198,12 @@ MP/
 node web-dashboard/server.js
 ```
 Then open **`http://localhost:3000`** in your browser. You will see:
-* Transactions from `data/transactions.csv` streaming live.
-* Real-time money mule alerts appearing automatically.
-* You can click **"🚨 Inject Mule Ring Attack"** to simulate an active coordinated attack.
+* **Enterprise Banking & SOC Design**: Executive layout with clean financial risk cards, zero visual clutter, and high data density.
+* **Light / Dark Theme Toggle**: Click the theme button in the top right to switch between **Clean Light Mode** (default) and **Enterprise Dark Mode** with instant local persistence.
+* **Live Ingestion**: Transactions from `data/transactions.csv` streaming live in the transaction ledger.
+* **Automated Mule Detection**: Real-time money mule alerts appearing automatically in the left surveillance panel.
+* **Audit Trail Flow**: Step-by-step visual money routing ($Remitter \to Suspect Mule \to Destination$) with exact velocity metrics ($\text{Time to Drain}$ and $\text{Drain Ratio}$).
+* **Attack Simulation**: Click **"Simulate Attack"** to inject a live multi-hop laundering attack into the stream.
 
 ### Option B: Run the Dataset Scanner Directly
 ```powershell

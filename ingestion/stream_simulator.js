@@ -79,7 +79,7 @@ function getNextTransaction() {
 
   const tx = cachedTransactions[currentIndex];
   currentIndex = (currentIndex + 1) % cachedTransactions.length;
-  
+
   // Clone and assign fresh live timestamp for active streaming
   return {
     ...tx,

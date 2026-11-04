@@ -399,6 +399,8 @@ b389e441-ac92-4f7f-9735-b3aae39a6990,2024-06-15 10:56:38,Pranay Sekhon,768981482
 699a0294-d8d5-47cc-9acd-16ca252d8bfe,2024-06-11 16:19:52,Priyansh Verma,8354036397@okaxis,Onkar Chaudhry,2818532815@okhdfcbank,5766.91,FAILED,AXIS,Chennai
 4318f7b6-60b0-4e97-b802-51c41b7f7d9a,2024-06-06 00:47:47,Kartik Sinha,6676021230@okaxis,Rhea Yadav,2203671740@oksbi,1458.92,FAILED,AXIS,Hyderabad
 dc19a066-4612-491d-b4b0-a062bd2d8f4b,2024-06-08 10:22:32,Miraya Vohra,6167342523@okybl,Gokul Dara,3904225326@okaxis,1821.12,SUCCESS,YBL,Bengaluru
+RING_01_TX1,2024-06-30 00:25:31,Kavita Joshi (Victim),kavita_victim@okaxis,Aman Sharma (Mule Tier-1),mule_sharma@okaxis,72000.00,SUCCESS,AXIS,Pune
+RING_01_TX2,2024-06-30 00:25:45,Aman Sharma (Mule Tier-1),mule_sharma@okaxis,Crypto Dubai Cashout,cashout_dubai@paytm,69000.00,SUCCESS,PAYTM,Mumbai
 125df19f-c39a-4e82-b08a-d88fa01edb1a,2024-06-30 05:55:31,Anahi Dube,2866805044@okhdfcbank,Vritika Soni,4185159018@okicici,6189.69,SUCCESS,HDFCBANK,Delhi
 4ebc9626-2a63-4946-be1e-1bc973ab6621,2024-06-19 06:44:42,Aradhya Basu,6219061905@okicici,Mohanlal Sani,5320355616@okhdfcbank,411.54,FAILED,ICICI,Pune
 07a28686-5402-43a5-b0d2-28099faf1d00,2024-06-30 17:15:59,Pari Dugal,3079422032@okaxis,Inaaya  Sen,6463568631@okhdfcbank,3260.45,FAILED,AXIS,Pune
@@ -899,6 +901,10 @@ fbd0b4bc-0033-4b83-8c3b-671187eb821b,2024-06-24 05:08:27,Lavanya Varkey,18552207
 61690da1-b773-4f8a-88b7-871bda6b28ba,2024-06-07 11:47:19,Diya Jayaraman,1925026074@okaxis,Chirag Kumer,7923405193@okaxis,9850.06,SUCCESS,AXIS,Ahmedabad
 ef27f439-d8b9-4a14-9950-7fe6d7f90181,2024-06-25 16:16:27,Zaina Mand,3660111118@okaxis,Chirag Dugal,5330124560@oksbi,8223.23,FAILED,AXIS,Ahmedabad
 a76a882b-53bb-4e57-822d-d702f9cd7fa1,2024-06-29 05:04:29,Mohanlal Das,7271034961@okybl,Ayesha Chaudhry,8729872931@okaxis,5579.51,FAILED,YBL,Chennai
+RING_02_SMURF1,2024-06-05 15:15:36,Sunil Rao (Victim),sunil_victim@okaxis,Devendra Gill (Mule Aggregator),mule_gill@okhdfcbank,45000.00,SUCCESS,AXIS,Bangalore
+RING_02_SMURF2,2024-06-05 15:15:46,Priya Nambiar (Victim),priya_victim@okybl,Devendra Gill (Mule Aggregator),mule_gill@okhdfcbank,38000.00,SUCCESS,YBL,Chennai
+RING_02_SMURF3,2024-06-05 15:15:56,Rohit Deshmukh (Victim),rohit_victim@okicici,Devendra Gill (Mule Aggregator),mule_gill@okhdfcbank,41000.00,SUCCESS,ICICI,Mumbai
+RING_02_DRAIN,2024-06-05 15:16:14,Devendra Gill (Mule Aggregator),mule_gill@okhdfcbank,Hawala Settlement Hub,hawala_hub_delhi@ybl,120000.00,SUCCESS,HDFCBANK,Delhi
 6e45bf4f-7c38-4657-bf09-b7fea403d756,2024-06-05 20:45:36,Nakul Chadha,3660029887@okybl,Lavanya Chaudhary,0874492315@okybl,611.89,SUCCESS,YBL,Bengaluru
 4facc110-3b0b-4801-951b-f12f743a420d,2024-06-15 16:20:56,Yuvraj  Vora,2462635115@okybl,Gokul Chokshi,6034749463@okaxis,5445.27,SUCCESS,YBL,Pune
 467e3b2c-d140-4d44-b467-2b15555085ac,2024-06-27 04:37:16,Badal Kant,7403499839@okaxis,Aaryahi Dhillon,0966121967@okaxis,3329.19,FAILED,AXIS,Mumbai
@@ -1399,6 +1405,9 @@ TXN0000000386,2024-05-09 21:19:58,User,user@okaxis,Merchant,merchant@okicici,391
 TXN0000000387,2024-07-25 16:56:24,User,user@okaxis,Merchant,merchant@okicici,4022.0,SUCCESS,ICICI,Ahmedabad
 TXN0000000388,2024-03-31 19:15:16,User,user@okaxis,Merchant,merchant@okicici,1352.0,SUCCESS,HDFC,Ahmedabad
 TXN0000000389,2024-05-07 14:25:26,User,user@okaxis,Merchant,merchant@okicici,573.0,SUCCESS,IndusInd,Delhi
+RING_03_H1,2024-05-20 11:07:54,Arun Mehra (Victim),arun_victim@okaxis,Gaurav Bhatia (Mule Tier-1),mule_bhatia_t1@okaxis,85000.00,SUCCESS,AXIS,Jaipur
+RING_03_H2,2024-05-20 11:08:06,Gaurav Bhatia (Mule Tier-1),mule_bhatia_t1@okaxis,Kunal Sen (Mule Tier-2),mule_sen_t2@okaxis,82000.00,SUCCESS,AXIS,Jaipur
+RING_03_H3,2024-05-20 11:08:20,Kunal Sen (Mule Tier-2),mule_sen_t2@okaxis,P2P Crypto Seller Offramp,p2p_crypto_desk@paytm,79000.00,SUCCESS,PAYTM,Kolkata
 TXN0000000390,2024-05-20 16:37:54,User,user@okaxis,Merchant,merchant@okicici,1008.0,SUCCESS,SBI,Bengaluru
 TXN0000000391,2024-05-17 17:05:43,User,user@okaxis,Merchant,merchant@okicici,1957.0,SUCCESS,Yes Bank,Hyderabad
 TXN0000000392,2024-01-21 00:32:00,User,user@okaxis,Merchant,merchant@okicici,410.0,SUCCESS,SBI,Ahmedabad
@@ -1899,6 +1908,10 @@ TXN0000000886,2024-07-11 02:11:44,User,user@okaxis,Merchant,merchant@okicici,432
 TXN0000000887,2024-06-28 15:25:34,User,user@okaxis,Merchant,merchant@okicici,609.0,SUCCESS,Kotak,Bengaluru
 TXN0000000888,2024-07-11 15:43:03,User,user@okaxis,Merchant,merchant@okicici,131.0,SUCCESS,Yes Bank,Kolkata
 TXN0000000889,2024-06-29 14:12:09,User,user@okaxis,Merchant,merchant@okicici,245.0,SUCCESS,ICICI,Hyderabad
+RING_04_SMURF1,2024-01-18 21:48:03,Tanvi Shah (Victim),tanvi_victim@okaxis,Naveen Jindal (Mule Aggregator),mule_jindal@okaxis,34000.00,SUCCESS,AXIS,Ahmedabad
+RING_04_SMURF2,2024-01-18 21:48:12,Sameer Khan (Victim),sameer_victim@okybl,Naveen Jindal (Mule Aggregator),mule_jindal@okaxis,39000.00,SUCCESS,YBL,Lucknow
+RING_04_SMURF3,2024-01-18 21:48:21,Bhavna Paul (Victim),bhavna_victim@okicici,Naveen Jindal (Mule Aggregator),mule_jindal@okaxis,42000.00,SUCCESS,ICICI,Delhi
+RING_04_DRAIN,2024-01-18 21:48:37,Naveen Jindal (Mule Aggregator),mule_jindal@okaxis,Offshore P2P Cashout,p2p_offshore@ybl,110000.00,SUCCESS,AXIS,Chandigarh
 TXN0000000890,2024-01-19 03:18:03,User,user@okaxis,Merchant,merchant@okicici,144.0,SUCCESS,Yes Bank,Chennai
 TXN0000000891,2024-03-12 22:31:39,User,user@okaxis,Merchant,merchant@okicici,913.0,SUCCESS,SBI,Bengaluru
 TXN0000000892,2024-03-14 21:24:58,User,user@okaxis,Merchant,merchant@okicici,1270.0,SUCCESS,HDFC,Ahmedabad
@@ -2399,6 +2412,8 @@ TXN0000001386,2024-09-26 13:19:45,User,user@okaxis,Merchant,merchant@okicici,414
 TXN0000001387,2024-01-08 19:14:37,User,user@okaxis,Merchant,merchant@okicici,778.0,SUCCESS,HDFC,Chennai
 TXN0000001388,2024-06-29 19:21:01,User,user@okaxis,Merchant,merchant@okicici,142.0,SUCCESS,Kotak,Ahmedabad
 TXN0000001389,2024-03-17 13:26:03,User,user@okaxis,Merchant,merchant@okicici,354.0,SUCCESS,Yes Bank,Bengaluru
+RING_05_H1,2024-06-13 03:01:22,Deepa Hegde (Victim),deepa_victim@okaxis,Rajeev Gupta (Mule Tier-1),mule_gupta_t1@okaxis,95000.00,SUCCESS,AXIS,Bangalore
+RING_05_H2,2024-06-13 03:01:37,Rajeev Gupta (Mule Tier-1),mule_gupta_t1@okaxis,ATM Cardless Offramp,cardless_cashout@sbi,91000.00,SUCCESS,AXIS,Bangalore
 TXN0000001390,2024-06-13 08:31:22,User,user@okaxis,Merchant,merchant@okicici,244.0,SUCCESS,Axis,Mumbai
 TXN0000001391,2024-04-11 11:59:21,User,user@okaxis,Merchant,merchant@okicici,122.0,SUCCESS,Axis,Mumbai
 TXN0000001392,2024-06-21 14:49:27,User,user@okaxis,Merchant,merchant@okicici,913.0,SUCCESS,SBI,Hyderabad
@@ -2899,6 +2914,9 @@ TXN0000001886,2024-03-28 19:01:24,User,user@okaxis,Merchant,merchant@okicici,109
 TXN0000001887,2024-02-27 11:30:47,User,user@okaxis,Merchant,merchant@okicici,697.0,SUCCESS,IndusInd,Chennai
 TXN0000001888,2024-07-26 13:40:53,User,user@okaxis,Merchant,merchant@okicici,2779.0,SUCCESS,Axis,Bengaluru
 TXN0000001889,2024-08-19 16:21:58,User,user@okaxis,Merchant,merchant@okicici,617.0,SUCCESS,HDFC,Chennai
+RING_06_H1,2024-08-10 14:30:32,Manish Tiwari (Victim),manish_victim@okaxis,Siddharth Patel (Mule Tier-1),mule_patel_t1@okaxis,115000.00,SUCCESS,AXIS,Bhopal
+RING_06_H2,2024-08-10 14:30:46,Siddharth Patel (Mule Tier-1),mule_patel_t1@okaxis,Lalit Yadav (Mule Tier-2),mule_yadav_t2@okaxis,110000.00,SUCCESS,AXIS,Ahmedabad
+RING_06_H3,2024-08-10 14:31:01,Lalit Yadav (Mule Tier-2),mule_yadav_t2@okaxis,Bullion Gold Settlement,bullion_cashout@hdfcbank,106000.00,SUCCESS,HDFCBANK,Mumbai
 TXN0000001890,2024-08-10 20:00:32,User,user@okaxis,Merchant,merchant@okicici,162.0,SUCCESS,ICICI,Chennai
 TXN0000001891,2024-04-15 20:49:46,User,user@okaxis,Merchant,merchant@okicici,335.0,SUCCESS,HDFC,Chennai
 TXN0000001892,2024-02-09 13:23:35,User,user@okaxis,Merchant,merchant@okicici,274.0,SUCCESS,HDFC,Mumbai
@@ -3399,6 +3417,10 @@ TXN0000002386,2024-11-26 21:17:44,User,user@okaxis,Merchant,merchant@okicici,129
 TXN0000002387,2024-05-21 16:38:42,User,user@okaxis,Merchant,merchant@okicici,465.0,SUCCESS,ICICI,Delhi
 TXN0000002388,2024-04-02 09:46:05,User,user@okaxis,Merchant,merchant@okicici,230.0,SUCCESS,SBI,Kolkata
 TXN0000002389,2024-04-13 11:09:27,User,user@okaxis,Merchant,merchant@okicici,4815.0,SUCCESS,Yes Bank,Mumbai
+RING_07_SMURF1,2024-11-24 10:19:36,Geeta Nair (Victim),geeta_victim@okaxis,Preeti Bansal (Mule Aggregator),mule_bansal@okicici,32000.00,SUCCESS,AXIS,Kochi
+RING_07_SMURF2,2024-11-24 10:19:44,Omkar Shinde (Victim),omkar_victim@okybl,Preeti Bansal (Mule Aggregator),mule_bansal@okicici,36000.00,SUCCESS,YBL,Pune
+RING_07_SMURF3,2024-11-24 10:19:53,Alok Pandey (Victim),alok_victim@okicici,Preeti Bansal (Mule Aggregator),mule_bansal@okicici,40000.00,SUCCESS,ICICI,Varanasi
+RING_07_DRAIN,2024-11-24 10:20:08,Preeti Bansal (Mule Aggregator),mule_bansal@okicici,Hawala Transfer Terminal,hawala_term@ybl,104000.00,SUCCESS,ICICI,Delhi
 TXN0000002390,2024-11-24 15:49:36,User,user@okaxis,Merchant,merchant@okicici,134.0,SUCCESS,HDFC,Delhi
 TXN0000002391,2024-09-10 10:13:00,User,user@okaxis,Merchant,merchant@okicici,1247.0,SUCCESS,SBI,Mumbai
 TXN0000002392,2024-01-25 10:48:20,User,user@okaxis,Merchant,merchant@okicici,779.0,SUCCESS,SBI,Chennai
@@ -3899,6 +3921,8 @@ TXN0000002886,2024-07-10 19:10:05,User,user@okaxis,Merchant,merchant@okicici,498
 TXN0000002887,2024-02-07 08:38:15,User,user@okaxis,Merchant,merchant@okicici,297.0,SUCCESS,PNB,Chennai
 TXN0000002888,2024-01-31 16:16:39,User,user@okaxis,Merchant,merchant@okicici,63.0,SUCCESS,Yes Bank,Chennai
 TXN0000002889,2024-06-14 16:11:30,User,user@okaxis,Merchant,merchant@okicici,5647.0,SUCCESS,HDFC,Chennai
+RING_08_H1,2024-05-04 15:33:24,Neha Varma (Victim),neha_victim@okaxis,Vipin Chopra (Mule Tier-1),mule_chopra_t1@okaxis,68000.00,SUCCESS,AXIS,Surat
+RING_08_H2,2024-05-04 15:33:35,Vipin Chopra (Mule Tier-1),mule_chopra_t1@okaxis,Crypto Exchange Desk,crypto_desk_in@paytm,65000.00,SUCCESS,PAYTM,Mumbai
 TXN0000002890,2024-05-04 21:03:24,User,user@okaxis,Merchant,merchant@okicici,666.0,SUCCESS,ICICI,Delhi
 TXN0000002891,2024-03-23 16:01:45,User,user@okaxis,Merchant,merchant@okicici,895.0,SUCCESS,Axis,Ahmedabad
 TXN0000002892,2024-03-19 19:29:13,User,user@okaxis,Merchant,merchant@okicici,379.0,SUCCESS,PNB,Pune
@@ -4399,6 +4423,9 @@ TXN0000003386,2024-02-01 20:15:35,User,user@okaxis,Merchant,merchant@okicici,375
 TXN0000003387,2024-07-28 12:52:20,User,user@okaxis,Merchant,merchant@okicici,2967.0,SUCCESS,IndusInd,Mumbai
 TXN0000003388,2024-07-26 09:51:03,User,user@okaxis,Merchant,merchant@okicici,5181.0,SUCCESS,Axis,Ahmedabad
 TXN0000003389,2024-05-15 17:50:52,User,user@okaxis,Merchant,merchant@okicici,166.0,SUCCESS,Kotak,Mumbai
+RING_09_H1,2024-05-14 15:48:38,Anita Kulkarni (Victim),anita_victim@okaxis,Rakesh Reddy (Mule Tier-1),mule_reddy_t1@okaxis,125000.00,SUCCESS,AXIS,Nagpur
+RING_09_H2,2024-05-14 15:48:53,Rakesh Reddy (Mule Tier-1),mule_reddy_t1@okaxis,Sanjay Sinha (Mule Tier-2),mule_sinha_t2@okaxis,120000.00,SUCCESS,AXIS,Hyderabad
+RING_09_H3,2024-05-14 15:49:09,Sanjay Sinha (Mule Tier-2),mule_sinha_t2@okaxis,International Forex Cashout,forex_remit@ybl,115000.00,SUCCESS,YBL,Mumbai
 TXN0000003390,2024-05-14 21:18:38,User,user@okaxis,Merchant,merchant@okicici,146.0,SUCCESS,Kotak,Pune
 TXN0000003391,2024-06-01 20:21:13,User,user@okaxis,Merchant,merchant@okicici,132.0,SUCCESS,SBI,Pune
 TXN0000003392,2024-08-02 17:11:00,User,user@okaxis,Merchant,merchant@okicici,1050.0,SUCCESS,HDFC,Bengaluru
@@ -4899,6 +4926,10 @@ TXN0000003886,2024-08-24 20:19:14,User,user@okaxis,Merchant,merchant@okicici,479
 TXN0000003887,2024-05-18 21:38:03,User,user@okaxis,Merchant,merchant@okicici,89.0,SUCCESS,SBI,Pune
 TXN0000003888,2024-08-25 22:01:28,User,user@okaxis,Merchant,merchant@okicici,1342.0,SUCCESS,SBI,Chennai
 TXN0000003889,2024-12-08 14:01:53,User,user@okaxis,Merchant,merchant@okicici,4370.0,SUCCESS,Axis,Delhi
+RING_10_SMURF1,2024-07-29 14:49:06,Karthik Raja (Victim),karthik_victim@okaxis,Farhan Qureshi (Mule Aggregator),mule_qureshi@okhdfcbank,48000.00,SUCCESS,AXIS,Chennai
+RING_10_SMURF2,2024-07-29 14:49:17,Swati Mishra (Victim),swati_victim@okybl,Farhan Qureshi (Mule Aggregator),mule_qureshi@okhdfcbank,44000.00,SUCCESS,YBL,Kanpur
+RING_10_SMURF3,2024-07-29 14:49:27,Dinesh Pillai (Victim),dinesh_victim@okicici,Farhan Qureshi (Mule Aggregator),mule_qureshi@okhdfcbank,47000.00,SUCCESS,ICICI,Coimbatore
+RING_10_DRAIN,2024-07-29 14:49:45,Farhan Qureshi (Mule Aggregator),mule_qureshi@okhdfcbank,Offshore Gaming Channel,gaming_offramp@ybl,135000.00,SUCCESS,HDFCBANK,Mumbai
 TXN0000003890,2024-07-29 20:19:06,User,user@okaxis,Merchant,merchant@okicici,52.0,SUCCESS,Kotak,Delhi
 TXN0000003891,2024-12-14 18:01:46,User,user@okaxis,Merchant,merchant@okicici,901.0,SUCCESS,ICICI,Ahmedabad
 TXN0000003892,2024-01-22 21:32:14,User,user@okaxis,Merchant,merchant@okicici,833.0,SUCCESS,SBI,Chennai
@@ -5399,6 +5430,8 @@ TXN0000004386,2024-06-25 13:25:35,User,user@okaxis,Merchant,merchant@okicici,116
 TXN0000004387,2024-11-15 21:02:24,User,user@okaxis,Merchant,merchant@okicici,421.0,SUCCESS,PNB,Delhi
 TXN0000004388,2024-05-04 15:20:23,User,user@okaxis,Merchant,merchant@okicici,1412.0,SUCCESS,Yes Bank,Pune
 TXN0000004389,2024-09-04 00:27:57,User,user@okaxis,Merchant,merchant@okicici,49.0,SUCCESS,PNB,Hyderabad
+RING_11_H1,2024-03-28 16:29:41,Vijay Menon (Victim),vijay_victim@okaxis,Anil Nair (Mule Tier-1),mule_nair_t1@okaxis,84000.00,SUCCESS,AXIS,Thiruvananthapuram
+RING_11_H2,2024-03-28 16:29:54,Anil Nair (Mule Tier-1),mule_nair_t1@okaxis,P2P Merchant Settlement,p2p_agent_delhi@paytm,80000.00,SUCCESS,PAYTM,Delhi
 TXN0000004390,2024-03-28 21:59:41,User,user@okaxis,Merchant,merchant@okicici,869.0,SUCCESS,ICICI,Ahmedabad
 TXN0000004391,2024-04-08 13:02:30,User,user@okaxis,Merchant,merchant@okicici,2188.0,SUCCESS,HDFC,Kolkata
 TXN0000004392,2024-08-03 22:36:53,User,user@okaxis,Merchant,merchant@okicici,1745.0,SUCCESS,HDFC,Pune
@@ -5899,6 +5932,9 @@ TXN0000004886,2024-05-29 11:20:25,User,user@okaxis,Merchant,merchant@okicici,401
 TXN0000004887,2024-01-07 20:38:23,User,user@okaxis,Merchant,merchant@okicici,2119.0,SUCCESS,SBI,Hyderabad
 TXN0000004888,2024-11-28 22:40:57,User,user@okaxis,Merchant,merchant@okicici,1341.0,SUCCESS,Axis,Ahmedabad
 TXN0000004889,2024-03-16 22:09:22,User,user@okaxis,Merchant,merchant@okicici,74.0,SUCCESS,Kotak,Delhi
+RING_12_H1,2024-06-08 14:51:32,Pooja Agarwal (Victim),pooja_victim@okaxis,Ashok Tiwari (Mule Tier-1),mule_tiwari_t1@okaxis,130000.00,SUCCESS,AXIS,Indore
+RING_12_H2,2024-06-08 14:51:49,Ashok Tiwari (Mule Tier-1),mule_tiwari_t1@okaxis,Mohit Rawat (Mule Tier-2),mule_rawat_t2@okaxis,124000.00,SUCCESS,AXIS,Indore
+RING_12_H3,2024-06-08 14:52:05,Mohit Rawat (Mule Tier-2),mule_rawat_t2@okaxis,Hawala Channel Cashout,hawala_node_mumbai@sbi,119000.00,SUCCESS,SBI,Mumbai
 TXN0000004890,2024-06-08 20:21:32,User,user@okaxis,Merchant,merchant@okicici,1401.0,SUCCESS,HDFC,Bengaluru
 TXN0000004891,2024-04-29 12:28:22,User,user@okaxis,Merchant,merchant@okicici,1771.0,SUCCESS,SBI,Mumbai
 TXN0000004892,2024-11-02 03:27:16,User,user@okaxis,Merchant,merchant@okicici,567.0,SUCCESS,SBI,Kolkata
@@ -6399,6 +6435,10 @@ TXN0000005386,2024-11-10 13:35:17,User,user@okaxis,Merchant,merchant@okicici,131
 TXN0000005387,2024-06-25 22:05:39,User,user@okaxis,Merchant,merchant@okicici,3405.0,SUCCESS,Axis,Chennai
 TXN0000005388,2024-07-20 17:36:55,User,user@okaxis,Merchant,merchant@okicici,49.0,SUCCESS,SBI,Mumbai
 TXN0000005389,2024-01-21 13:12:44,User,user@okaxis,Merchant,merchant@okicici,679.0,SUCCESS,Kotak,Chennai
+RING_13_SMURF1,2024-06-13 15:06:57,Meera Chawla (Victim),meera_victim@okaxis,Tarun Bose (Mule Aggregator),mule_bose@okaxis,35000.00,SUCCESS,AXIS,Amritsar
+RING_13_SMURF2,2024-06-13 15:07:07,Nitin Kaul (Victim),nitin_victim@okybl,Tarun Bose (Mule Aggregator),mule_bose@okaxis,39000.00,SUCCESS,YBL,Jammu
+RING_13_SMURF3,2024-06-13 15:07:17,Rekha Roy (Victim),rekha_victim@okicici,Tarun Bose (Mule Aggregator),mule_bose@okaxis,41000.00,SUCCESS,ICICI,Siliguri
+RING_13_DRAIN,2024-06-13 15:07:35,Tarun Bose (Mule Aggregator),mule_bose@okaxis,Crypto P2P Cashout Hub,crypto_p2p_hub@paytm,112000.00,SUCCESS,AXIS,Kolkata
 TXN0000005390,2024-06-13 20:36:57,User,user@okaxis,Merchant,merchant@okicici,266.0,SUCCESS,Axis,Pune
 TXN0000005391,2024-03-04 16:13:05,User,user@okaxis,Merchant,merchant@okicici,1223.0,SUCCESS,HDFC,Hyderabad
 TXN0000005392,2024-09-03 20:26:32,User,user@okaxis,Merchant,merchant@okicici,384.0,SUCCESS,SBI,Hyderabad
@@ -6899,6 +6939,8 @@ TXN0000005886,2024-06-02 18:20:41,User,user@okaxis,Merchant,merchant@okicici,597
 TXN0000005887,2024-10-25 07:56:41,User,user@okaxis,Merchant,merchant@okicici,7369.0,SUCCESS,SBI,Mumbai
 TXN0000005888,2024-05-27 11:40:43,User,user@okaxis,Merchant,merchant@okicici,3510.0,SUCCESS,Axis,Pune
 TXN0000005889,2024-11-18 23:38:04,User,user@okaxis,Merchant,merchant@okicici,688.0,SUCCESS,SBI,Mumbai
+RING_14_H1,2024-08-21 07:21:38,Harish Chandra (Victim),harish_victim@okaxis,Mukesh Yadav (Mule Tier-1),mule_yadav_m1@okaxis,90000.00,SUCCESS,AXIS,Prayagraj
+RING_14_H2,2024-08-21 07:21:52,Mukesh Yadav (Mule Tier-1),mule_yadav_m1@okaxis,Offshore Crypto Terminal,crypto_terminal@paytm,86000.00,SUCCESS,PAYTM,Mumbai
 TXN0000005890,2024-08-21 12:51:38,User,user@okaxis,Merchant,merchant@okicici,113.0,SUCCESS,HDFC,Mumbai
 TXN0000005891,2024-04-20 19:16:30,User,user@okaxis,Merchant,merchant@okicici,740.0,SUCCESS,SBI,Bengaluru
 TXN0000005892,2024-02-21 09:37:19,User,user@okaxis,Merchant,merchant@okicici,729.0,SUCCESS,SBI,Chennai
@@ -7399,6 +7441,10 @@ TXN0000006386,2024-07-14 18:32:35,User,user@okaxis,Merchant,merchant@okicici,236
 TXN0000006387,2024-01-02 13:40:32,User,user@okaxis,Merchant,merchant@okicici,196.0,SUCCESS,SBI,Ahmedabad
 TXN0000006388,2024-07-18 12:28:55,User,user@okaxis,Merchant,merchant@okicici,176.0,SUCCESS,Kotak,Hyderabad
 TXN0000006389,2024-08-02 11:23:09,User,user@okaxis,Merchant,merchant@okicici,547.0,SUCCESS,HDFC,Bengaluru
+RING_15_SMURF1,2024-02-29 14:59:03,Rashmi Sen (Victim),rashmi_victim@okaxis,Chetan Bhagat (Mule Aggregator),mule_bhagat@okicici,46000.00,SUCCESS,AXIS,Guwahati
+RING_15_SMURF2,2024-02-29 14:59:12,Vandana Das (Victim),vandana_victim@okybl,Chetan Bhagat (Mule Aggregator),mule_bhagat@okicici,43000.00,SUCCESS,YBL,Bhubaneswar
+RING_15_SMURF3,2024-02-29 14:59:21,Pramod Jena (Victim),pramod_victim@okicici,Chetan Bhagat (Mule Aggregator),mule_bhagat@okicici,48000.00,SUCCESS,ICICI,Cuttack
+RING_15_DRAIN,2024-02-29 14:59:39,Chetan Bhagat (Mule Aggregator),mule_bhagat@okicici,Hawala Offramp Terminal,hawala_offramp@ybl,132000.00,SUCCESS,ICICI,Mumbai
 TXN0000006390,2024-02-29 20:29:03,User,user@okaxis,Merchant,merchant@okicici,3269.0,SUCCESS,IndusInd,Chennai
 TXN0000006391,2024-04-10 12:38:57,User,user@okaxis,Merchant,merchant@okicici,486.0,SUCCESS,SBI,Mumbai
 TXN0000006392,2024-04-23 23:45:31,User,user@okaxis,Merchant,merchant@okicici,2055.0,SUCCESS,HDFC,Ahmedabad
@@ -7899,6 +7945,9 @@ TXN0000006886,2024-12-20 20:28:06,User,user@okaxis,Merchant,merchant@okicici,213
 TXN0000006887,2024-01-21 17:28:02,User,user@okaxis,Merchant,merchant@okicici,187.0,SUCCESS,Kotak,Pune
 TXN0000006888,2024-12-12 13:29:39,User,user@okaxis,Merchant,merchant@okicici,5891.0,SUCCESS,IndusInd,Ahmedabad
 TXN0000006889,2024-05-31 15:17:32,User,user@okaxis,Merchant,merchant@okicici,186.0,SUCCESS,SBI,Mumbai
+RING_16_H1,2024-11-05 15:36:02,Suresh Raina (Victim),suresh_victim@okaxis,Deepak Soni (Mule Tier-1),mule_soni_t1@okaxis,140000.00,SUCCESS,AXIS,Meerut
+RING_16_H2,2024-11-05 15:36:17,Deepak Soni (Mule Tier-1),mule_soni_t1@okaxis,Brijesh Mishra (Mule Tier-2),mule_mishra_t2@okaxis,134000.00,SUCCESS,AXIS,Agra
+RING_16_H3,2024-11-05 15:36:34,Brijesh Mishra (Mule Tier-2),mule_mishra_t2@okaxis,Gold Bullion Vault Settlement,bullion_vault@hdfcbank,128000.00,SUCCESS,HDFCBANK,Delhi
 TXN0000006890,2024-11-05 21:06:02,User,user@okaxis,Merchant,merchant@okicici,257.0,SUCCESS,SBI,Kolkata
 TXN0000006891,2024-09-20 12:56:56,User,user@okaxis,Merchant,merchant@okicici,3382.0,SUCCESS,PNB,Bengaluru
 TXN0000006892,2024-04-05 20:59:42,User,user@okaxis,Merchant,merchant@okicici,1448.0,SUCCESS,Yes Bank,Kolkata
@@ -8399,6 +8448,8 @@ TXN0000007386,2024-03-24 20:29:03,User,user@okaxis,Merchant,merchant@okicici,293
 TXN0000007387,2024-03-18 16:47:41,User,user@okaxis,Merchant,merchant@okicici,122.0,SUCCESS,SBI,Pune
 TXN0000007388,2024-08-05 17:43:36,User,user@okaxis,Merchant,merchant@okicici,679.0,SUCCESS,IndusInd,Chennai
 TXN0000007389,2024-07-15 10:00:13,User,user@okaxis,Merchant,merchant@okicici,28.0,SUCCESS,PNB,Ahmedabad
+RING_17_H1,2024-09-17 14:32:50,Kiran Bedi (Victim),kiran_victim@okaxis,Naresh Prasad (Mule Tier-1),mule_prasad_t1@okaxis,96000.00,SUCCESS,AXIS,Puducherry
+RING_17_H2,2024-09-17 14:33:02,Naresh Prasad (Mule Tier-1),mule_prasad_t1@okaxis,ATM Micro-ATM Cashout Hub,micro_atm_hub@sbi,92000.00,SUCCESS,SBI,Chennai
 TXN0000007390,2024-09-17 20:02:50,User,user@okaxis,Merchant,merchant@okicici,235.0,SUCCESS,SBI,Mumbai
 TXN0000007391,2024-06-15 19:22:02,User,user@okaxis,Merchant,merchant@okicici,1658.0,SUCCESS,SBI,Pune
 TXN0000007392,2024-12-08 10:24:12,User,user@okaxis,Merchant,merchant@okicici,4552.0,SUCCESS,SBI,Kolkata

@@ -1,8 +1,9 @@
 /**
- * RippleGuard SOC Dashboard Controller
- * Real-Time Stream Event Broker, CEP Renderer, and Threat Management
+ * UPI Sentinel - Enterprise SOC Dashboard Controller
+ * Real-Time CEP Stream Consumer, Threat Ledger & Theme Controller
  */
 
+// Global State
 let totalTx = 0;
 let totalAlerts = 0;
 let totalCrit = 0;
@@ -10,13 +11,42 @@ let totalVolume = 0;
 const trackedMules = new Set();
 const allAlerts = [];
 const allTransactions = [];
-const seenAlertIds = new Set(); // Dedup guard for SSE replays
+const seenAlertIds = new Set();
 
 let isStreamPaused = false;
 let activeFilter = 'all';
 let currentSearchQuery = '';
 
-// Live Clock
+// ========================================================
+// 1. Theme Controller (Light / Dark Mode)
+// ========================================================
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('sentinel_theme') || 'light';
+  applyTheme(savedTheme);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('sentinel_theme', theme);
+
+  const themeLabel = document.getElementById('theme-label');
+  if (themeLabel) {
+    themeLabel.innerText = theme === 'dark' ? 'Light' : 'Dark';
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const target = current === 'dark' ? 'light' : 'dark';
+  applyTheme(target);
+  showToast(`Switched to ${target.toUpperCase()} theme`);
+}
+
+// ========================================================
+// 2. Live System Clock & Metrics
+// ========================================================
+
 function updateClock() {
   const clockEl = document.getElementById('live-clock');
   if (!clockEl) return;
@@ -25,9 +55,8 @@ function updateClock() {
   clockEl.innerText = `${istStr} IST`;
 }
 setInterval(updateClock, 1000);
-updateClock();
 
-// TPS Tracker
+// Throughput Calculator (TPS)
 let lastTxSnapshot = 0;
 setInterval(() => {
   const delta = totalTx - lastTxSnapshot;
@@ -39,13 +68,35 @@ setInterval(() => {
   }
 }, 2000);
 
-// ── On page load: fetch existing alerts via REST so we never miss anything ──
+function updateMetrics() {
+  const statTx = document.getElementById('stat-tx');
+  const statVol = document.getElementById('stat-vol');
+  const statAlerts = document.getElementById('stat-alerts');
+  const statCrit = document.getElementById('stat-crit');
+  const statMules = document.getElementById('stat-mules');
+  const badge = document.getElementById('alerts-count-badge');
+
+  if (statTx) statTx.innerText = totalTx.toLocaleString('en-IN');
+  if (statVol) statVol.innerText = `Total Vol: ₹${Math.round(totalVolume).toLocaleString('en-IN')}`;
+  if (statAlerts) statAlerts.innerText = totalAlerts;
+  if (statCrit) statCrit.innerText = totalCrit;
+  if (statMules) statMules.innerText = trackedMules.size;
+  if (badge) badge.innerText = `${totalAlerts} Alerts`;
+}
+
+// ========================================================
+// 3. Data Fetching & Stream Intake
+// ========================================================
+
 window.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  updateClock();
+
+  // Bootstrap with existing alerts from REST API
   fetch('/api/alerts')
     .then(r => r.json())
     .then(alerts => {
       if (!Array.isArray(alerts) || alerts.length === 0) return;
-      // alerts array is newest-first from server
       alerts.forEach(alert => {
         if (seenAlertIds.has(alert.alert_id)) return;
         seenAlertIds.add(alert.alert_id);
@@ -54,15 +105,14 @@ window.addEventListener('DOMContentLoaded', () => {
         if (alert.severity === 'CRITICAL') totalCrit++;
         trackedMules.add(alert.suspect_vpa);
       });
-      // Keep newest-first order
       allAlerts.sort((a, b) => (b.alert_id > a.alert_id ? 1 : -1));
       updateMetrics();
       renderAlerts();
     })
-    .catch(() => {/* Fail silently — SSE will cover live events */});
+    .catch(() => {});
 });
 
-// Server-Sent Events listener
+// Server-Sent Events Listener
 const evtSource = new EventSource('/api/stream');
 
 evtSource.addEventListener('transaction', (event) => {
@@ -81,7 +131,6 @@ evtSource.addEventListener('transaction', (event) => {
 evtSource.addEventListener('alert', (event) => {
   const alert = JSON.parse(event.data);
 
-  // Dedup: skip if we already ingested this alert via REST bootstrap or SSE replay
   if (seenAlertIds.has(alert.alert_id)) return;
   seenAlertIds.add(alert.alert_id);
 
@@ -95,35 +144,22 @@ evtSource.addEventListener('alert', (event) => {
   updateMetrics();
   renderAlerts();
 
-  // Flash the alerts panel heading to draw user attention
-  const panelHeading = document.querySelector('.alerts-panel .panel-header');
-  if (panelHeading) {
-    panelHeading.classList.add('alert-flash');
-    setTimeout(() => panelHeading.classList.remove('alert-flash'), 1200);
+  // Subtle header highlight on new detection
+  const panelHeader = document.querySelector('.alerts-section .panel-header');
+  if (panelHeader) {
+    panelHeader.classList.add('alert-flash');
+    setTimeout(() => panelHeader.classList.remove('alert-flash'), 1500);
   }
 });
 
-function updateMetrics() {
-  const statTx = document.getElementById('stat-tx');
-  const statVol = document.getElementById('stat-vol');
-  const statAlerts = document.getElementById('stat-alerts');
-  const statCrit = document.getElementById('stat-crit');
-  const statMules = document.getElementById('stat-mules');
-  const badge = document.getElementById('alerts-count-badge');
-
-  if (statTx) statTx.innerText = totalTx.toLocaleString('en-IN');
-  if (statVol) statVol.innerText = `Total Vol: ₹${Math.round(totalVolume).toLocaleString('en-IN')}`;
-  if (statAlerts) statAlerts.innerText = totalAlerts;
-  if (statCrit) statCrit.innerText = totalCrit;
-  if (statMules) statMules.innerText = trackedMules.size;
-  if (badge) badge.innerText = `${totalAlerts} ALERTS`;
-}
+// ========================================================
+// 4. Rendering Engine
+// ========================================================
 
 function renderTransaction(tx) {
   const feed = document.getElementById('tx-feed');
   if (!feed) return;
 
-  // Search filter
   if (currentSearchQuery) {
     const q = currentSearchQuery.toLowerCase();
     const str = `${tx.sender_name} ${tx.sender_vpa} ${tx.receiver_name} ${tx.receiver_vpa} ${tx.bank_code} ${tx.location}`.toLowerCase();
@@ -134,8 +170,8 @@ function renderTransaction(tx) {
   item.className = 'tx-item';
 
   const isSuccess = tx.status === 'SUCCESS';
-  const statusBadge = isSuccess 
-    ? '<span class="badge-status status-success">SUCCESS</span>' 
+  const statusBadge = isSuccess
+    ? '<span class="badge-status status-success">SUCCESS</span>'
     : '<span class="badge-status status-failed">FAILED</span>';
 
   item.innerHTML = `
@@ -161,7 +197,7 @@ function renderTransaction(tx) {
   `;
 
   feed.prepend(item);
-  if (feed.children.length > 50) feed.lastChild.remove();
+  if (feed.children.length > 60) feed.lastChild.remove();
 }
 
 function renderAlerts() {
@@ -173,7 +209,6 @@ function renderAlerts() {
     placeholder.remove();
   }
 
-  // Filter alerts according to active tab
   const filtered = allAlerts.filter(a => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'CRITICAL') return a.severity === 'CRITICAL';
@@ -184,10 +219,15 @@ function renderAlerts() {
 
   if (filtered.length === 0) {
     feed.innerHTML = `
-      <div class="empty-state">
-        <div class="scanner-ring"></div>
-        <div class="empty-title">No Alerts in Selected Filter</div>
-        <div class="empty-desc">Monitoring incoming stream for ${activeFilter} events...</div>
+      <div class="empty-placeholder">
+        <div class="placeholder-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <div class="placeholder-title">No Incidents in Filter "${activeFilter}"</div>
+        <p class="placeholder-text">Evaluating live transactions for matching pattern signatures...</p>
       </div>
     `;
     return;
@@ -196,11 +236,11 @@ function renderAlerts() {
   filtered.forEach(alert => {
     const card = document.createElement('div');
     const isCritical = alert.severity === 'CRITICAL';
-    card.className = `alert-card ${isCritical ? 'crit-severity' : 'high-severity'}`;
+    card.className = `alert-card ${isCritical ? 'critical-threat' : 'high-threat'}`;
 
-    const sevPill = isCritical 
-      ? '<span class="severity-pill pill-critical">CRITICAL</span>' 
-      : '<span class="severity-pill pill-high">HIGH</span>';
+    const sevPill = isCritical
+      ? '<span class="severity-pill critical">CRITICAL</span>'
+      : '<span class="severity-pill high">HIGH</span>';
 
     const riskScore = alert.risk_score || 85;
     const isSmurfing = alert.rule_code === 'FAN_IN_SMURFING_AGGREGATOR';
@@ -208,56 +248,91 @@ function renderAlerts() {
     let flowHtml = '';
     if (isSmurfing) {
       flowHtml = `
-        <div class="laundering-flow">
-          <div class="flow-step">
-            <div class="flow-node">
-              <span class="node-role role-victim">MULTIPLE VICTIMS</span>
-              <span class="node-name">${alert.distinct_senders_count || 3} Remitters</span>
+        <div class="laundering-flow-box">
+          <div class="flow-node-row">
+            <div class="node-entity">
+              <span class="node-role-badge victim">VICTIMS</span>
+              <div class="node-name-vpa">
+                <span class="node-name">${alert.distinct_senders_count || 3} Remitters</span>
+                <span class="node-vpa">Multiple Compromised Accounts</span>
+              </div>
             </div>
-            <span class="flow-arrow-row">Aggregation Window &le; 120s</span>
+            <span class="meta-pill">Window &le; 120s</span>
           </div>
-          <div class="flow-arrow-row">
-            <span>&darr; Aggregated Total: ₹${(alert.amount_drained || alert.total_inflow || 0).toLocaleString('en-IN')}</span>
-            <div class="flow-arrow-line"></div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-node">
-              <span class="node-role role-mule">🚨 MULE AGGREGATOR</span>
-              <span class="node-name">${escapeHtml(alert.suspect_name)}</span>
-              <span class="node-vpa">&lt;${escapeHtml(alert.suspect_vpa)}&gt;</span>
+
+          <div class="flow-hop-connector">
+            <div class="hop-line"></div>
+            <div class="hop-telemetry critical-speed">
+              &darr; Smurfing Inflow Aggregation: ₹${(alert.amount_drained || 0).toLocaleString('en-IN')}
             </div>
+            <div class="hop-line"></div>
+          </div>
+
+          <div class="flow-node-row">
+            <div class="node-entity">
+              <span class="node-role-badge mule">MULE AGGREGATOR</span>
+              <div class="node-name-vpa">
+                <span class="node-name">${escapeHtml(alert.suspect_name)}</span>
+                <span class="node-vpa">&lt;${escapeHtml(alert.suspect_vpa)}&gt;</span>
+              </div>
+            </div>
+            <span class="meta-pill amount">₹${(alert.amount_drained || 0).toLocaleString('en-IN')}</span>
           </div>
         </div>
       `;
     } else {
       flowHtml = `
-        <div class="laundering-flow">
-          <div class="flow-step">
-            <div class="flow-node">
-              <span class="node-role role-victim">VICTIM</span>
-              <span class="node-name">${escapeHtml(alert.source_victim || alert.source_vpa || 'Compromised Account')}</span>
+        <div class="laundering-flow-box">
+          <!-- Step 1: Inflow Remitter -->
+          <div class="flow-node-row">
+            <div class="node-entity">
+              <span class="node-role-badge victim">REMITTER</span>
+              <div class="node-name-vpa">
+                <span class="node-name">${escapeHtml(alert.source_vpa || 'Compromised Remitter')}</span>
+              </div>
             </div>
+            <span class="meta-pill">Source</span>
           </div>
-          <div class="flow-arrow-row">
-            <span>&darr; Layering Inflow</span>
-            <div class="flow-arrow-line"></div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-node">
-              <span class="node-role role-mule">🚨 MULE ACCOUNT</span>
-              <span class="node-name">${escapeHtml(alert.suspect_name)}</span>
-              <span class="node-vpa">&lt;${escapeHtml(alert.suspect_vpa)}&gt;</span>
+
+          <!-- Hop 1 -> 2: Rapid In-to-Out Velocity -->
+          <div class="flow-hop-connector">
+            <div class="hop-line"></div>
+            <div class="hop-telemetry ${isCritical ? 'critical-speed' : ''}">
+              &darr; Drained ${alert.drain_percentage}% in ${alert.time_to_drain_seconds}s
             </div>
+            <div class="hop-line"></div>
           </div>
-          <div class="flow-arrow-row">
-            <span>&darr; Rapid Outflow: Drained ${alert.drain_percentage}% in ${alert.time_to_drain_seconds}s</span>
-            <div class="flow-arrow-line"></div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-node">
-              <span class="node-role role-dest">DESTINATION</span>
-              <span class="node-name">${escapeHtml(alert.target_destination || alert.target_vpa || 'Cashout Off-ramp')}</span>
+
+          <!-- Step 2: Intermediate Mule -->
+          <div class="flow-node-row">
+            <div class="node-entity">
+              <span class="node-role-badge mule">SUSPECT MULE</span>
+              <div class="node-name-vpa">
+                <span class="node-name">${escapeHtml(alert.suspect_name)}</span>
+                <span class="node-vpa">&lt;${escapeHtml(alert.suspect_vpa)}&gt;</span>
+              </div>
             </div>
+            <span class="meta-pill amount">₹${(alert.amount_drained || 0).toLocaleString('en-IN')}</span>
+          </div>
+
+          <!-- Hop 2 -> 3 -->
+          <div class="flow-hop-connector">
+            <div class="hop-line"></div>
+            <div class="hop-telemetry">
+              &darr; Immediate Transfer Out
+            </div>
+            <div class="hop-line"></div>
+          </div>
+
+          <!-- Step 3: Off-Ramp Target -->
+          <div class="flow-node-row">
+            <div class="node-entity">
+              <span class="node-role-badge destination">DESTINATION</span>
+              <div class="node-name-vpa">
+                <span class="node-name">${escapeHtml(alert.target_vpa || 'Cashout Account')}</span>
+              </div>
+            </div>
+            <span class="meta-pill">Exit Channel</span>
           </div>
         </div>
       `;
@@ -265,30 +340,29 @@ function renderAlerts() {
 
     card.innerHTML = `
       <div class="alert-card-top">
-        <div class="alert-rule-badge">
+        <div class="rule-meta-group">
           ${sevPill}
-          <span class="rule-name">${escapeHtml(alert.rule_code)}</span>
+          <span class="rule-code-name">${escapeHtml(alert.rule_code)}</span>
         </div>
         <div class="risk-meter">
-          <div class="risk-bar-container">
-            <div class="risk-bar-fill" style="width: ${riskScore}%;"></div>
+          <div class="risk-bar">
+            <div class="risk-bar-fill ${isCritical ? 'critical' : 'high'}" style="width: ${riskScore}%;"></div>
           </div>
-          <span class="risk-score-text">Risk: ${riskScore}/100</span>
+          <span class="risk-score-badge">Risk ${riskScore}/100</span>
         </div>
       </div>
 
       ${flowHtml}
 
-      <div class="alert-tags-row">
-        <div class="tag-list">
-          <span class="info-pill">${alert.bank ? `🏛️ ${escapeHtml(alert.bank)}` : '🏛️ UPI'}</span>
-          <span class="info-pill">${alert.location ? `📍 ${escapeHtml(alert.location)}` : '📍 India'}</span>
-          ${alert.time_to_drain_seconds > 0 ? `<span class="info-pill">⏱️ ${alert.time_to_drain_seconds}s Drain</span>` : ''}
-          <span class="info-pill">₹${(alert.amount_drained || 0).toLocaleString('en-IN')}</span>
-          <span class="info-pill">🕒 ${escapeHtml(alert.alert_time || new Date().toLocaleTimeString())}</span>
+      <div class="alert-footer-row">
+        <div class="alert-metadata-pills">
+          <span class="meta-pill">${alert.bank ? `🏛️ ${escapeHtml(alert.bank)}` : '🏛️ UPI'}</span>
+          <span class="meta-pill">${alert.location ? `📍 ${escapeHtml(alert.location)}` : '📍 India'}</span>
+          ${alert.time_to_drain_seconds > 0 ? `<span class="meta-pill">⏱️ ${alert.time_to_drain_seconds}s Velocity</span>` : ''}
+          <span class="meta-pill">🕒 ${escapeHtml(alert.alert_time || new Date().toLocaleTimeString())}</span>
         </div>
-        <button class="btn-quarantine" onclick="quarantineMule('${escapeHtml(alert.suspect_vpa)}')">
-          🛡️ Quarantine Account
+        <button class="btn-quarantine-action" onclick="quarantineMule('${escapeHtml(alert.suspect_vpa)}')">
+          Quarantine Account
         </button>
       </div>
     `;
@@ -297,9 +371,13 @@ function renderAlerts() {
   });
 }
 
+// ========================================================
+// 5. User Controls & Actions
+// ========================================================
+
 function setAlertFilter(filter, btnEl) {
   activeFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.seg-btn').forEach(btn => btn.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
   renderAlerts();
 }
@@ -312,24 +390,21 @@ function togglePauseStream() {
   isStreamPaused = !isStreamPaused;
   const icon = document.getElementById('pause-icon');
   const label = document.getElementById('pause-label');
-  const btn = document.getElementById('btn-pause');
 
   if (isStreamPaused) {
     if (icon) icon.innerText = '▶️';
-    if (label) label.innerText = 'Resume Stream';
-    if (btn) btn.style.borderColor = 'var(--accent-amber)';
-    showToast('Stream rendering paused on client.');
+    if (label) label.innerText = 'Resume';
+    showToast('Live stream rendering paused');
   } else {
     if (icon) icon.innerText = '⏸';
-    if (label) label.innerText = 'Pause Stream';
-    if (btn) btn.style.borderColor = '';
-    showToast('Stream resumed.');
+    if (label) label.innerText = 'Pause';
+    showToast('Live stream resumed');
   }
 }
 
 async function injectMuleAttack() {
   try {
-    showToast('⚡ Injected coordinated 3-hop mule attack into stream.');
+    showToast('⚡ Injected coordinated 3-hop mule attack sequence');
     const res = await fetch('/api/inject-mule');
     if (!res.ok) console.warn('Mule attack trigger HTTP status:', res.status);
   } catch (err) {
@@ -338,7 +413,7 @@ async function injectMuleAttack() {
 }
 
 function quarantineMule(vpa) {
-  showToast(`🛡️ VPA ${vpa} quarantined across UPI rails and blacklisted.`);
+  showToast(`Quarantined account: ${vpa}`);
 }
 
 function showToast(msg) {
@@ -346,13 +421,13 @@ function showToast(msg) {
   if (!container) return;
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.innerText = msg;
+  toast.innerHTML = `<span>🛡️</span> <span>${escapeHtml(msg)}</span>`;
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(10px)';
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+    setTimeout(() => toast.remove(), 250);
+  }, 3200);
 }
 
 function escapeHtml(str) {
