@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { getNextTransaction, injectMuleAttack } = require('../ingestion/stream_simulator');
 
-const PORT = process.env.PORT || 3000;
+let PORT = parseInt(process.env.PORT || '3000', 10);
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // In-Memory Storage & Subscriber registry
@@ -174,6 +174,13 @@ function handleIngestedTx(tx) {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
+  // Favicon handler
+  if (url.pathname === '/favicon.ico') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   // SSE Stream Endpoint
   if (url.pathname === '/api/stream') {
     res.writeHead(200, {
@@ -226,15 +233,26 @@ const server = http.createServer((req, res) => {
       '.html': 'text/html',
       '.css': 'text/css',
       '.js': 'application/javascript',
-      '.json': 'application/json'
+      '.json': 'application/json',
+      '.svg': 'image/svg+xml'
     };
     res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' });
     fs.createReadStream(filePath).pipe(res);
     return;
   }
 
-  res.writeHead(404);
+  res.writeHead(404, { 'Content-Type': 'text/plain' });
   res.end('Not Found');
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.warn(`[Warning] Port ${PORT} is in use. Trying port ${PORT + 1}...`);
+    PORT = PORT + 1;
+    server.listen(PORT);
+  } else {
+    console.error('[Server Error]', err);
+  }
 });
 
 server.listen(PORT, () => {
