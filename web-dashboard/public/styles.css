@@ -854,6 +854,18 @@ body {
   background: rgba(255, 255, 255, 0.22);
 }
 
+/* Alert-flash animation — fires on panel header when new alert arrives */
+@keyframes alert-flash-anim {
+  0%   { background: rgba(244, 63, 94, 0.0); }
+  25%  { background: rgba(244, 63, 94, 0.18); box-shadow: 0 0 24px rgba(244, 63, 94, 0.3); }
+  60%  { background: rgba(244, 63, 94, 0.08); }
+  100% { background: transparent; }
+}
+.alert-flash {
+  animation: alert-flash-anim 1.2s ease-out forwards;
+  border-radius: 10px 10px 0 0;
+}
+
 
 .toast {
   background: rgba(16, 25, 40, 0.95);
@@ -899,4 +911,16 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.22);
+}
+
+/* Alert-flash animation — fires on panel header when new alert arrives */
+@keyframes alert-flash-anim {
+  0%   { background: rgba(244, 63, 94, 0.0); }
+  25%  { background: rgba(244, 63, 94, 0.18); box-shadow: 0 0 24px rgba(244, 63, 94, 0.3); }
+  60%  { background: rgba(244, 63, 94, 0.08); }
+  100% { background: transparent; }
+}
+.alert-flash {
+  animation: alert-flash-anim 1.2s ease-out forwards;
+  border-radius: 10px 10px 0 0;
 }

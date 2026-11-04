@@ -10,6 +10,7 @@ let totalVolume = 0;
 const trackedMules = new Set();
 const allAlerts = [];
 const allTransactions = [];
+const seenAlertIds = new Set(); // Dedup guard for SSE replays
 
 let isStreamPaused = false;
 let activeFilter = 'all';
@@ -38,6 +39,29 @@ setInterval(() => {
   }
 }, 2000);
 
+// ── On page load: fetch existing alerts via REST so we never miss anything ──
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('/api/alerts')
+    .then(r => r.json())
+    .then(alerts => {
+      if (!Array.isArray(alerts) || alerts.length === 0) return;
+      // alerts array is newest-first from server
+      alerts.forEach(alert => {
+        if (seenAlertIds.has(alert.alert_id)) return;
+        seenAlertIds.add(alert.alert_id);
+        allAlerts.push(alert);
+        totalAlerts++;
+        if (alert.severity === 'CRITICAL') totalCrit++;
+        trackedMules.add(alert.suspect_vpa);
+      });
+      // Keep newest-first order
+      allAlerts.sort((a, b) => (b.alert_id > a.alert_id ? 1 : -1));
+      updateMetrics();
+      renderAlerts();
+    })
+    .catch(() => {/* Fail silently — SSE will cover live events */});
+});
+
 // Server-Sent Events listener
 const evtSource = new EventSource('/api/stream');
 
@@ -56,6 +80,11 @@ evtSource.addEventListener('transaction', (event) => {
 
 evtSource.addEventListener('alert', (event) => {
   const alert = JSON.parse(event.data);
+
+  // Dedup: skip if we already ingested this alert via REST bootstrap or SSE replay
+  if (seenAlertIds.has(alert.alert_id)) return;
+  seenAlertIds.add(alert.alert_id);
+
   totalAlerts++;
   if (alert.severity === 'CRITICAL') totalCrit++;
   trackedMules.add(alert.suspect_vpa);
@@ -65,6 +94,13 @@ evtSource.addEventListener('alert', (event) => {
 
   updateMetrics();
   renderAlerts();
+
+  // Flash the alerts panel heading to draw user attention
+  const panelHeading = document.querySelector('.alerts-panel .panel-header');
+  if (panelHeading) {
+    panelHeading.classList.add('alert-flash');
+    setTimeout(() => panelHeading.classList.remove('alert-flash'), 1200);
+  }
 });
 
 function updateMetrics() {
@@ -141,8 +177,7 @@ function renderAlerts() {
   const filtered = allAlerts.filter(a => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'CRITICAL') return a.severity === 'CRITICAL';
-    if (activeFilter === a.rule_code) return true;
-    return true;
+    return a.rule_code === activeFilter;
   });
 
   feed.innerHTML = '';
@@ -262,11 +297,10 @@ function renderAlerts() {
   });
 }
 
-function setAlertFilter(filter) {
+function setAlertFilter(filter, btnEl) {
   activeFilter = filter;
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  const target = event.target;
-  if (target) target.classList.add('active');
+  if (btnEl) btnEl.classList.add('active');
   renderAlerts();
 }
 

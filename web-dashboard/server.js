@@ -19,6 +19,7 @@ const dbTransactions = [];
 const dbAlerts = [];
 const activeSubscribers = new Set();
 const accountStateMap = new Map();
+let alertSeq = 0; // Monotonic counter for unique alert IDs
 
 function getOrCreateState(vpa, name = '') {
   const key = String(vpa || '').toLowerCase().trim();
@@ -92,7 +93,7 @@ function processStreamEvent(tx) {
       senderState.riskScore = Math.min(99, 75 + Math.round((60 - timeDeltaSeconds) * 0.4));
 
       emitAlert({
-        alert_id: 'ALT-' + Date.now().toString().slice(-6),
+        alert_id: 'ALT-' + (++alertSeq).toString().padStart(4, '0') + '-' + Date.now().toString().slice(-5),
         alert_time: new Date().toLocaleTimeString(),
         rule_code: 'RAPID_PASS_THROUGH_MULE',
         severity: isCritical ? 'CRITICAL' : 'HIGH',
@@ -120,7 +121,7 @@ function processStreamEvent(tx) {
     const totalAggregated = receiverState.recentCredits.reduce((s, c) => s + c.amount, 0);
 
     emitAlert({
-      alert_id: 'ALT-' + Date.now().toString().slice(-6),
+      alert_id: 'ALT-' + (++alertSeq).toString().padStart(4, '0') + '-' + Date.now().toString().slice(-5),
       alert_time: new Date().toLocaleTimeString(),
       rule_code: 'FAN_IN_SMURFING_AGGREGATOR',
       severity: 'CRITICAL',
@@ -190,6 +191,27 @@ const server = http.createServer((req, res) => {
       'Access-Control-Allow-Origin': '*'
     });
     res.write('retry: 2000\n\n');
+
+    // Replay any alerts already in buffer so a late-connecting browser sees them immediately
+    if (dbAlerts.length > 0) {
+      const replaySlice = dbAlerts.slice(0, 50); // send up to 50 historical alerts
+      replaySlice.reverse().forEach(alert => {
+        try {
+          res.write(`event: alert\ndata: ${JSON.stringify(alert)}\n\n`);
+        } catch (_) {}
+      });
+    }
+
+    // Replay last 20 transactions so the feed isn't empty
+    if (dbTransactions.length > 0) {
+      const txSlice = dbTransactions.slice(0, 20);
+      txSlice.reverse().forEach(tx => {
+        try {
+          res.write(`event: transaction\ndata: ${JSON.stringify(tx)}\n\n`);
+        } catch (_) {}
+      });
+    }
+
     activeSubscribers.add(res);
     req.on('close', () => activeSubscribers.delete(res));
     return;
@@ -270,4 +292,16 @@ server.listen(PORT, () => {
       handleIngestedTx(tx);
     }
   }, 450);
+
+  // Auto-trigger a live mule attack 3 seconds after startup
+  // This ensures the browser sees real detections even if it connects after the CSV mule rows passed
+  setTimeout(() => {
+    console.log('\n[Auto-Demo] Firing startup mule attack demo for dashboard...');
+    injectMuleAttack(handleIngestedTx);
+  }, 3000);
+
+  // Fire another mule attack every 60 seconds to keep the dashboard active
+  setInterval(() => {
+    injectMuleAttack(handleIngestedTx);
+  }, 60000);
 });
