@@ -1,15 +1,4 @@
 transaction_id,timestamp,sender_name,sender_vpa,receiver_name,receiver_vpa,amount,status,bank_code,location
-MULE_TXN_001,2024-06-19 06:04:49,Mohanlal Bakshi,8908837379@okaxis,Mehul Sankaran (Mule Tier-1),7683454560@okaxis,65000.00,SUCCESS,AXIS,Delhi
-MULE_TXN_002,2024-06-19 06:05:01,Mehul Sankaran (Mule Tier-1),7683454560@okaxis,Rhea Kothari (Mule Tier-2),2246623650@okaxis,62000.00,SUCCESS,AXIS,Delhi
-MULE_TXN_003,2024-06-19 06:05:15,Rhea Kothari (Mule Tier-2),2246623650@okaxis,Crypto Offramp Settlement,crypto_cashout@paytm,59500.00,SUCCESS,PAYTM,Mumbai
-MULE_TXN_004,2024-06-25 10:15:00,Tiya Mall (Victim),4161803452@okaxis,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,38000.00,SUCCESS,AXIS,Ahmedabad
-MULE_TXN_005,2024-06-25 10:15:18,Jivin Batta (Victim),1977143985@okybl,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,42000.00,SUCCESS,YBL,Ahmedabad
-MULE_TXN_006,2024-06-25 10:15:40,Kismat Rama (Victim),5438757524@okicici,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,29000.00,SUCCESS,ICICI,Delhi
-MULE_TXN_007,2024-06-25 10:16:05,Ivana Tak (Victim),0518391082@okaxis,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,45000.00,SUCCESS,AXIS,Pune
-MULE_TXN_008,2024-06-25 10:16:33,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,Hawala Offramp Channel,hawala_node@ybl,150000.00,SUCCESS,HDFCBANK,Mumbai
-MULE_TXN_009,2024-06-28 14:00:10,Sanjay Verma (Victim),sanjay_victim@oksbi,Deepak Soni (Splitter Mule),deepak_splitter@okicici,85000.00,SUCCESS,SBI,Bengaluru
-MULE_TXN_010,2024-06-28 14:00:22,Deepak Soni (Splitter Mule),deepak_splitter@okicici,Cashout Node A,cashout_node_a@okaxis,42000.00,SUCCESS,ICICI,Bengaluru
-MULE_TXN_011,2024-06-28 14:00:31,Deepak Soni (Splitter Mule),deepak_splitter@okicici,Cashout Node B,cashout_node_b@okhdfcbank,41000.00,SUCCESS,ICICI,Bengaluru
 4d3db980-46cd-4158-a812-dcb77055d0d2,2024-06-22 04:06:38,Tiya Mall,4161803452@okaxis,Mohanlal Golla,7776849307@okybl,3907.34,FAILED,AXIS,Ahmedabad
 099ee548-2fc1-4811-bf92-559c467ca792,2024-06-19 06:04:49,Mohanlal Bakshi,8908837379@okaxis,Mehul Sankaran,7683454560@okaxis,8404.55,SUCCESS,AXIS,Delhi
 d4c05732-6b1b-4bab-90b9-efe09d252b99,2024-06-04 04:56:09,Kismat Bora,4633654150@okybl,Diya Goel,2598130823@okicici,941.88,SUCCESS,YBL,Pune
@@ -30,6 +19,17 @@ ea5862f0-0edf-4490-976a-958e9799a21c,2024-06-24 04:52:50,Eshani Ram,3559104422@o
 299a7bf0-12e0-4f32-85bd-ae7f4ac7af90,2024-06-07 22:14:24,Nitara Yogi,6536690172@okhdfcbank,Nitya Balay,8821754441@okicici,151.42,FAILED,HDFCBANK,Kolkata
 c03ec1e5-e536-43b4-bf71-71fa84fc4b91,2024-06-20 14:07:14,Raunak Jaggi,4135909907@oksbi,Neysa Salvi,1977155980@okicici,3787.73,FAILED,SBI,Delhi
 7eddc148-8755-4901-b31d-8ba5ee895860,2024-07-01 03:57:18,Rati Sawhney,0595448518@oksbi,Drishya Bava,8231626532@okybl,2675.65,SUCCESS,SBI,Pune
+MULE_TXN_001,2024-06-19 06:04:49,Mohanlal Bakshi,8908837379@okaxis,Mehul Sankaran (Mule Tier-1),7683454560@okaxis,65000.00,SUCCESS,AXIS,Delhi
+MULE_TXN_002,2024-06-19 06:05:01,Mehul Sankaran (Mule Tier-1),7683454560@okaxis,Rhea Kothari (Mule Tier-2),2246623650@okaxis,62000.00,SUCCESS,AXIS,Delhi
+MULE_TXN_003,2024-06-19 06:05:15,Rhea Kothari (Mule Tier-2),2246623650@okaxis,Crypto Offramp Settlement,crypto_cashout@paytm,59500.00,SUCCESS,PAYTM,Mumbai
+MULE_TXN_004,2024-06-25 10:15:00,Tiya Mall (Victim),4161803452@okaxis,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,38000.00,SUCCESS,AXIS,Ahmedabad
+MULE_TXN_005,2024-06-25 10:15:18,Jivin Batta (Victim),1977143985@okybl,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,42000.00,SUCCESS,YBL,Ahmedabad
+MULE_TXN_006,2024-06-25 10:15:40,Kismat Rama (Victim),5438757524@okicici,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,29000.00,SUCCESS,ICICI,Delhi
+MULE_TXN_007,2024-06-25 10:16:05,Ivana Tak (Victim),0518391082@okaxis,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,45000.00,SUCCESS,AXIS,Pune
+MULE_TXN_008,2024-06-25 10:16:33,Vikram Roy (Mule Aggregator),vikram_mule@okhdfcbank,Hawala Offramp Channel,hawala_node@ybl,150000.00,SUCCESS,HDFCBANK,Mumbai
+MULE_TXN_009,2024-06-28 14:00:10,Sanjay Verma (Victim),sanjay_victim@oksbi,Deepak Soni (Splitter Mule),deepak_splitter@okicici,85000.00,SUCCESS,SBI,Bengaluru
+MULE_TXN_010,2024-06-28 14:00:22,Deepak Soni (Splitter Mule),deepak_splitter@okicici,Cashout Node A,cashout_node_a@okaxis,42000.00,SUCCESS,ICICI,Bengaluru
+MULE_TXN_011,2024-06-28 14:00:31,Deepak Soni (Splitter Mule),deepak_splitter@okicici,Cashout Node B,cashout_node_b@okhdfcbank,41000.00,SUCCESS,ICICI,Bengaluru
 46982aee-d402-46bd-96f1-2a181bdd9e78,2024-06-24 00:37:36,Samaira Mand,4726181930@okicici,Eva Chander,6348447507@okicici,5770.18,SUCCESS,ICICI,Pune
 6f4d28fd-cb6e-465e-8b18-225b2e743da9,2024-06-25 00:18:04,Anika Deep,5289057366@okicici,Anya Rege,6677358228@okicici,1368.23,FAILED,ICICI,Delhi
 94aa141e-9f72-44e6-a89c-b18cac10ad48,2024-06-17 13:34:42,Anika Keer,8216661258@okybl,Samiha Aurora,2394946306@okaxis,9755.14,FAILED,YBL,Mumbai

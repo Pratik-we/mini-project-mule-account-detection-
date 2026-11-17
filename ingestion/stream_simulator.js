@@ -203,8 +203,32 @@ function injectMuleAttack(onTxGenerated) {
   }, 5000); // Start smurfing ring 5s after the first chain
 }
 
+function getDatasetStats() {
+  init();
+  const totalRows = cachedTransactions.length;
+  let totalVolume = 0;
+  let successful = 0;
+  let failed = 0;
+  for (const t of cachedTransactions) {
+    if (t.status === 'SUCCESS') {
+      successful++;
+      totalVolume += (t.amount || 0);
+    } else {
+      failed++;
+    }
+  }
+  return {
+    totalRows,
+    totalVolume,
+    successful,
+    failed,
+    currentIndex
+  };
+}
+
 module.exports = {
   loadDataset,
   getNextTransaction,
-  injectMuleAttack
+  injectMuleAttack,
+  getDatasetStats
 };

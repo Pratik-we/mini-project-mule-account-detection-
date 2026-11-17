@@ -1,211 +1,671 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 
 <head>
   <meta charset="UTF-8">
-  <title>Sentinel | Real-Time UPI Money Mule & Fraud Detection Engine</title>
+  <title>SENTINEL | Enterprise UPI Fraud Intelligence & Mule Network SOC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 
 <body>
 
-  <!-- Enterprise Top Navigation Bar -->
+  <!-- Top Global Navigation Header -->
   <header class="app-header">
     <div class="header-left">
       <div class="brand-logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           <path d="m9 12 2 2 4-4"></path>
         </svg>
       </div>
       <div class="brand-info">
         <div class="brand-title-row">
-          <span class="brand-name">FRAUD DETECTION</span>
-          <span class="brand-badge">Financial Fraud Intelligence</span>
+          <span class="brand-name">SENTINEL SOC</span>
+          <span class="brand-badge">FINANCIAL FRAUD INTELLIGENCE</span>
         </div>
-        <span class="brand-sub">Real-Time Money Mule & Rapid Velocity Detection</span>
+        <span class="brand-sub">Real-Time UPI Stream Processing & Mule Network Forensics</span>
       </div>
     </div>
 
-    <!-- Live System Telemetry -->
+    <!-- Live Telemetry Pill Bar -->
     <div class="header-center">
       <div class="status-indicator">
-        <span class="status-dot pulse"></span>
-        <span class="status-label">Stream Live</span>
+        <span class="status-dot pulse" id="telemetry-dot"></span>
+        <span class="status-label" id="telemetry-status">STREAM LIVE</span>
       </div>
       <div class="telemetry-item">
-        <span class="telemetry-label">Engine:</span>
-        <span class="telemetry-val">Flink CEP In-Memory</span>
+        <span class="telemetry-label">CEP Rules:</span>
+        <span class="telemetry-val text-cyan">6 Active</span>
       </div>
       <div class="telemetry-item">
-        <span class="telemetry-label">Source:</span>
-        <span class="telemetry-val">UPI Gateway (9K+ Rows)</span>
+        <span class="telemetry-label">Latency:</span>
+        <span class="telemetry-val text-cyan" id="header-latency">0.4 ms</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Store:</span>
+        <span class="telemetry-val text-cyan" id="header-store">In-Memory Graph</span>
       </div>
     </div>
 
-    <!-- Actions & Theme Toggle -->
+    <!-- Actions & Global Controls -->
     <div class="header-right">
       <div class="clock-display" id="live-clock">--:--:-- IST</div>
 
-      <!-- Stream Control Button -->
-      <button class="btn btn-secondary btn-sm" id="btn-pause" onclick="togglePauseStream()" title="Pause live transaction intake">
+      <!-- Quick Speed Controls -->
+      <div class="segmented-control speed-selector" title="Replay Speed Multiplier">
+        <button class="seg-btn active" id="spd-1x" onclick="setStreamSpeed('1x', this)">1x</button>
+        <button class="seg-btn" id="spd-5x" onclick="setStreamSpeed('5x', this)">5x</button>
+        <button class="seg-btn" id="spd-20x" onclick="setStreamSpeed('20x', this)">20x</button>
+        <button class="seg-btn" id="spd-50x" onclick="setStreamSpeed('50x', this)">50x</button>
+      </div>
+
+      <!-- Stream Pause Button -->
+      <button class="btn btn-secondary btn-sm" id="btn-pause" onclick="togglePauseStream()"
+        title="Pause live transaction intake">
         <span id="pause-icon">⏸</span>
         <span id="pause-label">Pause</span>
       </button>
 
-      <!-- Simulate Attack Trigger -->
-      <button class="btn btn-danger btn-sm" onclick="injectMuleAttack()" title="Inject synthetic coordinated money mule attack">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Quick Attack Button -->
+      <button class="btn btn-danger btn-sm" onclick="triggerQuickScenario('rapid-pass-through')"
+        title="Inject rapid pass-through attack scenario">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
-        <span>Simulate Attack</span>
+        <span>Inject Attack</span>
       </button>
 
-      <!-- Theme Switcher Button -->
-      <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light / Dark mode" aria-label="Toggle Theme">
-        <span class="theme-icon light-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-        </span>
-        <span class="theme-icon dark-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </span>
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme"
+        aria-label="Toggle Theme">
+        <span class="theme-icon dark-icon">🌙</span>
+        <span class="theme-icon light-icon">☀️</span>
         <span class="theme-label" id="theme-label">Dark</span>
       </button>
     </div>
   </header>
 
-  <!-- Executive KPI Metrics Overview -->
-  <section class="metrics-grid">
-    <div class="metric-card">
-      <div class="metric-header">
-        <span class="metric-title">Total Transactions</span>
-        <span class="metric-badge neutral">Live Stream</span>
-      </div>
-      <div class="metric-value" id="stat-tx">0</div>
-      <div class="metric-sub" id="stat-vol">Total Vol: ₹0</div>
+  <!-- Secondary Operational Navigation Bar -->
+  <nav class="sub-nav">
+    <div class="nav-tabs" role="tablist">
+      <button class="nav-tab active" data-tab="tab-command-center" onclick="switchTab('tab-command-center', this)">
+        <span class="nav-icon">📊</span>
+        <span>Command Center</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-live-transactions" onclick="switchTab('tab-live-transactions', this)">
+        <span class="nav-icon">⚡</span>
+        <span>Live Transactions</span>
+        <span class="nav-badge" id="nav-tx-badge">0</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-fraud-alerts" onclick="switchTab('tab-fraud-alerts', this)">
+        <span class="nav-icon">🚨</span>
+        <span>Fraud Alerts</span>
+        <span class="nav-badge danger-badge" id="nav-alerts-badge">0</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-network-intelligence" onclick="switchTab('tab-network-intelligence', this)">
+        <span class="nav-icon">🕸️</span>
+        <span>Network Intelligence</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-account-investigation" onclick="switchTab('tab-account-investigation', this)">
+        <span class="nav-icon">🔍</span>
+        <span>Account Investigation</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-analytics" onclick="switchTab('tab-analytics', this)">
+        <span class="nav-icon">📈</span>
+        <span>Analytics &amp; Reports</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-simulation-lab" onclick="switchTab('tab-simulation-lab', this)">
+        <span class="nav-icon">🧪</span>
+        <span>Simulation Lab</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-system-monitoring" onclick="switchTab('tab-system-monitoring', this)">
+        <span class="nav-icon">🖥️</span>
+        <span>System Monitoring</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-settings" onclick="switchTab('tab-settings', this)">
+        <span class="nav-icon">⚙️</span>
+        <span>Settings</span>
+      </button>
     </div>
 
-    <div class="metric-card danger-card">
-      <div class="metric-header">
-        <span class="metric-title">Flagged Mule Incidents</span>
-        <span class="metric-badge danger">High Confidence</span>
-      </div>
-      <div class="metric-value danger-text" id="stat-alerts">0</div>
-      <div class="metric-sub">CEP Pattern Detections</div>
+    <!-- Global Search -->
+    <div class="nav-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="global-search-input" placeholder="Search VPA, Name, TxID..." onkeydown="handleGlobalSearch(event)">
     </div>
+  </nav>
 
-    <div class="metric-card warning-card">
-      <div class="metric-header">
-        <span class="metric-title">Critical Velocity Drains</span>
-        <span class="metric-badge warning">&le; 15s Window</span>
-      </div>
-      <div class="metric-value warning-text" id="stat-crit">0</div>
-      <div class="metric-sub">Rapid In-and-Out Hops</div>
-    </div>
+  <!-- Main View Container -->
+  <main class="main-container">
 
-    <div class="metric-card purple-card">
-      <div class="metric-header">
-        <span class="metric-title">Under Surveillance</span>
-        <span class="metric-badge purple">Identified Mules</span>
-      </div>
-      <div class="metric-value purple-text" id="stat-mules">0</div>
-      <div class="metric-sub">Unique Suspicious Accounts</div>
-    </div>
-
-    <div class="metric-card success-card">
-      <div class="metric-header">
-        <span class="metric-title">Stream Ingestion Rate</span>
-        <span class="metric-badge success">Operational</span>
-      </div>
-      <div class="metric-value success-text" id="stat-tps">2.2 /s</div>
-      <div class="metric-sub">Processing Latency &lt; 5ms</div>
-    </div>
-  </section>
-
-  <!-- Main Split Console Area -->
-  <main class="console-layout">
-    
-    <!-- Left Workspace: Mule Risk & Pattern Alerts -->
-    <section class="console-panel alerts-section">
-      <div class="panel-header">
-        <div class="panel-title-block">
-          <div class="panel-title-row">
-            <h2>Real-Time Mule Network &amp; Rapid-Drain Alerts</h2>
-            <span class="counter-badge" id="alerts-count-badge">0 Alerts</span>
+    <!-- ========================================================
+         VIEW 1: COMMAND CENTER
+         ======================================================== -->
+    <section class="tab-view active" id="tab-command-center">
+      <!-- 8 Executive KPIs -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Total Ingested</span>
+            <span class="metric-badge neutral">Live Stream</span>
           </div>
-          <p class="panel-description">Stateful tracking of rapid pass-through layering and fan-in smurfing aggregators</p>
+          <div class="metric-value text-cyan" id="kpi-tx">0</div>
+          <div class="metric-sub" id="kpi-tx-sub">of 9,077 Dataset Events (0%)</div>
         </div>
 
-        <!-- Filter Tabs / Segmented Control -->
-        <div class="segmented-control" role="tablist">
-          <button class="seg-btn active" onclick="setAlertFilter('all', this)">All</button>
-          <button class="seg-btn" onclick="setAlertFilter('CRITICAL', this)">Critical (&le;15s)</button>
-          <button class="seg-btn" onclick="setAlertFilter('RAPID_PASS_THROUGH_MULE', this)">Pass-Through</button>
-          <button class="seg-btn" onclick="setAlertFilter('FAN_IN_SMURFING_AGGREGATOR', this)">Smurfing</button>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Settled Volume</span>
+            <span class="metric-badge neutral">INR Cumulative</span>
+          </div>
+          <div class="metric-value" id="kpi-vol">₹0</div>
+          <div class="metric-sub" id="kpi-vol-sub">Total Dataset: ₹1.75 Cr</div>
+        </div>
+
+        <div class="metric-card danger-card">
+          <div class="metric-header">
+            <span class="metric-title">Fraud &amp; Mule Alerts</span>
+            <span class="metric-badge danger">Threats Flagged</span>
+          </div>
+          <div class="metric-value danger-text" id="kpi-alerts">0</div>
+          <div class="metric-sub" id="kpi-alerts-sub">Detection Rate: 0.00%</div>
+        </div>
+
+        <div class="metric-card critical-card">
+          <div class="metric-header">
+            <span class="metric-title">Critical Threats</span>
+            <span class="metric-badge critical">Score ≥ 85</span>
+          </div>
+          <div class="metric-value critical-text" id="kpi-critical">0</div>
+          <div class="metric-sub">Immediate Action Required</div>
+        </div>
+
+        <div class="metric-card purple-card">
+          <div class="metric-header">
+            <span class="metric-title">Active Suspect Mules</span>
+            <span class="metric-badge purple">Under Watch</span>
+          </div>
+          <div class="metric-value purple-text" id="kpi-mules">0</div>
+          <div class="metric-sub" id="kpi-mules-sub">Quarantined: 0</div>
+        </div>
+
+        <div class="metric-card success-card">
+          <div class="metric-header">
+            <span class="metric-title">Throughput (TPS)</span>
+            <span class="metric-badge success">Live Engine</span>
+          </div>
+          <div class="metric-value success-text" id="kpi-tps">2.5 /s</div>
+          <div class="metric-sub">Event Stream Ingestion</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Detection Latency</span>
+            <span class="metric-badge neutral">Sub-Millisecond</span>
+          </div>
+          <div class="metric-value text-cyan" id="kpi-latency">0.4 ms</div>
+          <div class="metric-sub">Sliding Window CEP</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Engine Health</span>
+            <span class="metric-badge success">100% HEALTHY</span>
+          </div>
+          <div class="metric-value success-text" id="kpi-health">ONLINE</div>
+          <div class="metric-sub" id="kpi-uptime">Uptime: 0m 0s</div>
         </div>
       </div>
 
-      <div class="panel-body alerts-scroll-area" id="alerts-feed">
-        <div class="empty-placeholder" id="alerts-placeholder">
-          <div class="placeholder-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
+      <!-- Real-Time Visual Charts Row -->
+      <div class="charts-row">
+        <div class="chart-panel">
+          <div class="panel-header">
+            <div class="panel-title-block">
+              <h3>Transaction Throughput &amp; Volume Over Time</h3>
+              <p>Rolling time-series volume of settled funds</p>
+            </div>
+            <span class="chart-badge">Real-Time</span>
           </div>
-          <div class="placeholder-title">Sentinel Radar Monitoring Active</div>
-          <p class="placeholder-text">Analyzing transaction velocity, sender-receiver graph, and time-to-drain thresholds. Detections will appear here in real time.</p>
+          <div class="panel-body canvas-container">
+            <canvas id="chart-volume" width="600" height="200"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <div class="panel-header">
+            <div class="panel-title-block">
+              <h3>Alert Severity Distribution</h3>
+              <p>Breakdown by Risk Scoring Engine</p>
+            </div>
+            <span class="chart-badge">Dynamic</span>
+          </div>
+          <div class="panel-body canvas-container">
+            <canvas id="chart-severity" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dual Split Layout: Critical Threats & Live Feed Preview -->
+      <div class="console-split-grid">
+        <div class="console-panel">
+          <div class="panel-header">
+            <div class="panel-title-block">
+              <h3>🚨 Critical Threat Surveillance</h3>
+              <p>Highest risk mule rings &amp; rapid draining events</p>
+            </div>
+            <button class="btn btn-secondary btn-xs" onclick="switchTab('tab-fraud-alerts')">View All Alerts</button>
+          </div>
+          <div class="panel-body scrollable-feed" id="command-alerts-feed">
+            <div class="empty-placeholder">
+              <div class="placeholder-icon">🛡️</div>
+              <div class="placeholder-title">No Critical Threats Yet</div>
+              <p class="placeholder-text">Evaluating live stream for high-velocity laundering signatures...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-panel">
+          <div class="panel-header">
+            <div class="panel-title-block">
+              <h3>⚡ Live Transaction Ledger</h3>
+              <p>Real-time event-time UPI stream</p>
+            </div>
+            <button class="btn btn-secondary btn-xs" onclick="switchTab('tab-live-transactions')">Open Ledger</button>
+          </div>
+          <div class="panel-body scrollable-feed" id="command-tx-feed"></div>
         </div>
       </div>
     </section>
 
-    <!-- Right Workspace: Live Transaction Stream Ledger -->
-    <section class="console-panel ledger-section">
-      <div class="panel-header">
-        <div class="panel-title-block">
-          <div class="panel-title-row">
-            <h2>Live UPI Transaction Feed</h2>
-            <span class="feed-tag">Ingesting Dataset</span>
+    <!-- ========================================================
+         VIEW 2: LIVE TRANSACTIONS
+         ======================================================== -->
+    <section class="tab-view" id="tab-live-transactions">
+      <div class="console-panel full-height">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <h2>Real-Time UPI Transaction Ledger</h2>
+            <p>Continuous event-driven stream from <code>data/transactions.csv</code></p>
           </div>
-          <p class="panel-description">Continuous event stream from <code>data/transactions.csv</code></p>
+          <div class="panel-actions">
+            <div class="search-box">
+              <input type="text" id="tx-search-input" placeholder="Filter VPA, Name, Bank, City..." oninput="onTxTableFilter()">
+            </div>
+            <div class="segmented-control" role="tablist">
+              <button class="seg-btn active" onclick="setTxStatusFilter('ALL', this)">All</button>
+              <button class="seg-btn" onclick="setTxStatusFilter('SUCCESS', this)">Success</button>
+              <button class="seg-btn" onclick="setTxStatusFilter('FAILED', this)">Failed</button>
+              <button class="seg-btn" onclick="setTxStatusFilter('HIGH_VAL', this)">₹40k+ High Value</button>
+            </div>
+          </div>
         </div>
-
-        <!-- Clean Search Box -->
-        <div class="search-box">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="tx-search" placeholder="Search VPA, Bank, City..." oninput="onTxSearch(this.value)" autocomplete="off">
+        <div class="table-scroll-container">
+          <table class="soc-table" id="transactions-table">
+            <thead>
+              <tr>
+                <th>Time (IST)</th>
+                <th>Transaction ID</th>
+                <th>Sender (Remitter)</th>
+                <th></th>
+                <th>Receiver (Beneficiary)</th>
+                <th>Amount (INR)</th>
+                <th>Status</th>
+                <th>Bank</th>
+                <th>Location</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body"></tbody>
+          </table>
         </div>
       </div>
+    </section>
 
-      <div class="panel-body ledger-scroll-area" id="tx-feed"></div>
+    <!-- ========================================================
+         VIEW 3: FRAUD ALERTS
+         ======================================================== -->
+    <section class="tab-view" id="tab-fraud-alerts">
+      <div class="console-panel full-height">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <h2>Fraud &amp; Money Mule Surveillance Center</h2>
+            <p>Multi-pattern Complex Event Processing detections with explainable risk breakdown</p>
+          </div>
+          <div class="panel-actions">
+            <div class="segmented-control" role="tablist">
+              <button class="seg-btn active" onclick="setAlertsFilter('ALL', this)">All Alerts</button>
+              <button class="seg-btn" onclick="setAlertsFilter('CRITICAL', this)">Critical (≥85)</button>
+              <button class="seg-btn" onclick="setAlertsFilter('RAPID_PASS_THROUGH_MULE', this)">Pass-Through</button>
+              <button class="seg-btn" onclick="setAlertsFilter('FAN_IN_SMURFING_AGGREGATOR', this)">Smurfing</button>
+              <button class="seg-btn" onclick="setAlertsFilter('FAN_OUT_DISTRIBUTION', this)">Fan-Out</button>
+              <button class="seg-btn" onclick="setAlertsFilter('MULTI_HOP_LAYERING', this)">Multi-Hop</button>
+              <button class="seg-btn" onclick="setAlertsFilter('CIRCULAR_TRANSACTION_LOOP', this)">Loops</button>
+              <button class="seg-btn" onclick="setAlertsFilter('STRUCTURING_SPLIT', this)">Structuring</button>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="exportAlerts('json')">Export JSON</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportAlerts('csv')">Export CSV</button>
+          </div>
+        </div>
+        <div class="alerts-feed-grid" id="full-alerts-feed"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 4: NETWORK INTELLIGENCE (INTERACTIVE GRAPH)
+         ======================================================== -->
+    <section class="tab-view" id="tab-network-intelligence">
+      <div class="network-layout">
+        <!-- Main Interactive Graph Canvas -->
+        <div class="network-canvas-panel">
+          <div class="graph-toolbar">
+            <div class="toolbar-left">
+              <span class="toolbar-title">🕸️ Transaction Flow &amp; Mule Ring Graph</span>
+              <span class="graph-stats-pill" id="graph-stats-pill">0 Nodes | 0 Edges</span>
+            </div>
+            <div class="toolbar-right">
+              <input type="text" id="graph-search-vpa" placeholder="Focus Account VPA..." onkeydown="onGraphSearchKey(event)">
+              <button class="btn btn-secondary btn-xs" onclick="resetGraphView()">Reset View</button>
+              <button class="btn btn-secondary btn-xs" onclick="highlightMultiHopChains()">Highlight Chains</button>
+              <button class="btn btn-secondary btn-xs" onclick="highlightCycles()">Detect Cycles</button>
+              <button class="btn btn-primary btn-xs" onclick="refreshGraphData()">Refresh Graph</button>
+            </div>
+          </div>
+          <!-- Canvas Graph Viewport -->
+          <div class="canvas-viewport" id="graph-viewport-container">
+            <canvas id="network-canvas"></canvas>
+            <div class="graph-legend">
+              <span class="legend-item"><span class="legend-dot normal"></span> Normal Account</span>
+              <span class="legend-item"><span class="legend-dot aggregator"></span> Aggregator (Smurfing)</span>
+              <span class="legend-item"><span class="legend-dot dispersal"></span> Dispersal (Fan-Out)</span>
+              <span class="legend-item"><span class="legend-dot mule"></span> High Risk Mule</span>
+              <span class="legend-item"><span class="legend-dot critical"></span> Critical Threat</span>
+              <span class="legend-item"><span class="legend-dot quarantined"></span> Quarantined</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Inspected Node / Edge Dossier -->
+        <div class="network-sidebar">
+          <div class="panel-header">
+            <h3>Graph Inspector</h3>
+            <span class="badge-status status-success" id="inspector-status-badge">Select Node</span>
+          </div>
+          <div class="panel-body" id="graph-inspector-body">
+            <div class="empty-placeholder">
+              <div class="placeholder-icon">🔍</div>
+              <div class="placeholder-title">No Account Selected</div>
+              <p class="placeholder-text">Click on any account node in the network graph to inspect connectivity, velocity, counter-parties, and risk breakdown.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 5: ACCOUNT INVESTIGATION DOSSIER
+         ======================================================== -->
+    <section class="tab-view" id="tab-account-investigation">
+      <div class="investigation-layout">
+        <div class="investigation-search-bar">
+          <span class="search-title">Investigate Account:</span>
+          <input type="text" id="investigate-vpa-input" placeholder="Enter Virtual Payment Address (e.g. 7683454560@okaxis)..." onkeydown="onInvestigateKey(event)">
+          <button class="btn btn-primary btn-sm" onclick="investigateAccount()">Load Profile</button>
+          <div class="quick-suspects">
+            <span>Recent High-Risk Suspects:</span>
+            <div class="quick-pill-list" id="quick-suspects-list"></div>
+          </div>
+        </div>
+
+        <div class="investigation-content" id="investigation-content-area">
+          <div class="empty-placeholder">
+            <div class="placeholder-icon">🗂️</div>
+            <div class="placeholder-title">Ready for Account Audit</div>
+            <p class="placeholder-text">Enter an account VPA or click any alert/node to view the complete 360-degree forensic dossier, transaction history, case timeline, and active quarantine controls.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 6: ANALYTICS & REPORTS
+         ======================================================== -->
+    <section class="tab-view" id="tab-analytics">
+      <div class="analytics-grid">
+        <div class="chart-panel">
+          <div class="panel-header">
+            <h3>High-Risk Bank Exposure Distribution</h3>
+            <span class="chart-badge">Bank Breakdown</span>
+          </div>
+          <div class="panel-body canvas-container">
+            <canvas id="chart-banks" width="500" height="240"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <div class="panel-header">
+            <h3>Geographic Concentration</h3>
+            <span class="chart-badge">City / Hub</span>
+          </div>
+          <div class="panel-body canvas-container">
+            <canvas id="chart-geo" width="500" height="240"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-panel full-width">
+          <div class="panel-header">
+            <h3>Detection Rule Performance &amp; Incident Volume</h3>
+            <div class="panel-actions">
+              <button class="btn btn-secondary btn-sm" onclick="exportAlerts('json')">Download Forensic JSON</button>
+              <button class="btn btn-secondary btn-sm" onclick="exportAlerts('csv')">Download Audit CSV</button>
+            </div>
+          </div>
+          <div class="panel-body" id="analytics-rules-table-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 7: SIMULATION LAB
+         ======================================================== -->
+    <section class="tab-view" id="tab-simulation-lab">
+      <div class="simulation-layout">
+        <div class="simulation-header-card">
+          <div class="sim-title-group">
+            <h2>Attack Simulation &amp; Stress Testing Lab</h2>
+            <p>Inject real-world synthetic attack vectors into the live processing pipeline to test detection rules, risk scoring, and latency.</p>
+          </div>
+          <div class="sim-controls-group">
+            <button class="btn btn-secondary" onclick="togglePauseStream()" id="sim-pause-btn">Pause Stream</button>
+            <button class="btn btn-danger" onclick="resetStreamState()">Reset State</button>
+          </div>
+        </div>
+
+        <div class="scenario-cards-grid">
+          <!-- Scenario 1 -->
+          <div class="scenario-card">
+            <div class="scen-icon">⚡</div>
+            <div class="scen-title">Rapid In-to-Out Fund Draining</div>
+            <div class="scen-desc">Victim sends ₹75,000 to Mule Tier-1; Mule drains ₹72,000 (96%) in 3.5 seconds to off-ramp.</div>
+            <div class="scen-meta">
+              <span class="tag danger">Pass-Through</span>
+              <span class="tag">Velocity &le; 4s</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="triggerSimulation('rapid-pass-through')">Inject Attack</button>
+          </div>
+
+          <!-- Scenario 2 -->
+          <div class="scenario-card">
+            <div class="scen-icon">🌪️</div>
+            <div class="scen-title">Fan-In Smurfing Aggregator</div>
+            <div class="scen-desc">4 distinct victim accounts transfer amounts into 1 central mule aggregator within seconds.</div>
+            <div class="scen-meta">
+              <span class="tag danger">Smurfing</span>
+              <span class="tag">4 Victims</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="triggerSimulation('fan-in-smurfing')">Inject Attack</button>
+          </div>
+
+          <!-- Scenario 3 -->
+          <div class="scenario-card">
+            <div class="scen-icon">💥</div>
+            <div class="scen-title">Fan-Out Distribution Dispersal</div>
+            <div class="scen-desc">Mule distributor receives ₹1,80,000 and disperses it to 4 distinct runner accounts within seconds.</div>
+            <div class="scen-meta">
+              <span class="tag warning">Dispersal</span>
+              <span class="tag">4 Runners</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="triggerSimulation('fan-out-distribution')">Inject Attack</button>
+          </div>
+
+          <!-- Scenario 4 -->
+          <div class="scenario-card">
+            <div class="scen-icon">⛓️</div>
+            <div class="scen-title">Multi-Hop Layering Chain</div>
+            <div class="scen-desc">4-Hop laundering sequence: Victim &rarr; Mule 1 &rarr; Mule 2 &rarr; Mule 3 &rarr; Gold Bullion Vault.</div>
+            <div class="scen-meta">
+              <span class="tag danger">Layering</span>
+              <span class="tag">4 Hops</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="triggerSimulation('multi-hop-chain')">Inject Attack</button>
+          </div>
+
+          <!-- Scenario 5 -->
+          <div class="scenario-card">
+            <div class="scen-icon">🔄</div>
+            <div class="scen-title">Circular Transaction Loop</div>
+            <div class="scen-desc">Wash trading loop: Manish Traders &rarr; Shree Logistics &rarr; Apex Financial &rarr; Manish Traders.</div>
+            <div class="scen-meta">
+              <span class="tag warning">Loop</span>
+              <span class="tag">Cycle Detection</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="triggerSimulation('circular-loop')">Inject Attack</button>
+          </div>
+
+          <!-- Scenario 6 -->
+          <div class="scenario-card">
+            <div class="scen-icon">🧩</div>
+            <div class="scen-title">Structuring &amp; Transaction Splitting</div>
+            <div class="scen-desc">4 rapid transfers between ₹47,000 and ₹49,500 within 40 seconds to evade the ₹50,000 reporting threshold.</div>
+            <div class="scen-meta">
+              <span class="tag warning">Structuring</span>
+              <span class="tag">Sub-Threshold</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="triggerSimulation('structuring-split')">Inject Attack</button>
+          </div>
+        </div>
+
+        <div class="sim-audit-feed">
+          <h3>Simulation Execution Telemetry</h3>
+          <div class="sim-log-terminal" id="sim-log-terminal">
+            <div class="log-line">[SYSTEM] Simulation Lab Ready. Select any scenario above to inject synthetic transactions.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 8: SYSTEM MONITORING & TELEMETRY
+         ======================================================== -->
+    <section class="tab-view" id="tab-system-monitoring">
+      <div class="monitoring-grid">
+        <div class="metric-card">
+          <div class="metric-title">Event Loop Processing Latency</div>
+          <div class="metric-value text-cyan" id="mon-latency">0.4 ms</div>
+          <div class="metric-sub">P99 Latency: &lt; 2.1 ms</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Stream Engine Status</div>
+          <div class="metric-value success-text">RUNNING</div>
+          <div class="metric-sub">Mode 1: Zero-Dependency High-Throughput</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">ClickHouse Sync Status</div>
+          <div class="metric-value" id="mon-clickhouse">OFFLINE (STANDALONE)</div>
+          <div class="metric-sub">Port 8123 HTTP Gateway</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">In-Memory Graph Cardinality</div>
+          <div class="metric-value text-cyan" id="mon-graph-size">0 Nodes</div>
+          <div class="metric-sub" id="mon-graph-edges">0 Directed Edges</div>
+        </div>
+
+        <div class="console-panel full-width">
+          <div class="panel-header">
+            <h3>Distributed Architecture Status &amp; Deployment Options</h3>
+          </div>
+          <div class="panel-body doc-content">
+            <p>The platform supports <strong>Dual-Engine Architecture</strong>:</p>
+            <ul>
+              <li><strong>Mode 1 (Active): Native High-Performance In-Memory Stream Core</strong>: Runs with zero dependencies directly on Node.js v24. Processes 9,077 transactions with sub-millisecond CEP evaluation, real-time SSE broadcast, graph indexing, and case management.</li>
+              <li><strong>Mode 2: Distributed Production Cluster (Docker Compose)</strong>: Integrates Apache Kafka (KRaft), Apache Flink 1.17, and ClickHouse 23.8. To activate, ensure Docker Desktop is running and execute:
+                <code>docker compose -f docker/docker-compose.yml up -d</code>.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 9: SETTINGS & DETECTION RULES CONFIGURATION
+         ======================================================== -->
+    <section class="tab-view" id="tab-settings">
+      <div class="settings-layout">
+        <div class="console-panel">
+          <div class="panel-header">
+            <h3>Detection Rule Thresholds &amp; Parameters</h3>
+          </div>
+          <div class="panel-body settings-form">
+            <div class="form-row">
+              <label>Sliding Window Duration (seconds):</label>
+              <input type="number" id="cfg-window" value="120" readonly>
+            </div>
+            <div class="form-row">
+              <label>Rapid Drain Maximum Velocity (seconds):</label>
+              <input type="number" id="cfg-drain-sec" value="120" readonly>
+            </div>
+            <div class="form-row">
+              <label>Rapid Drain Minimum Percentage (%):</label>
+              <input type="number" id="cfg-drain-ratio" value="70" readonly>
+            </div>
+            <div class="form-row">
+              <label>Fan-In Smurfing Minimum Distinct Remitters:</label>
+              <input type="number" id="cfg-fanin" value="3" readonly>
+            </div>
+            <div class="form-row">
+              <label>Fan-Out Dispersal Minimum Distinct Beneficiaries:</label>
+              <input type="number" id="cfg-fanout" value="3" readonly>
+            </div>
+            <div class="form-row">
+              <label>Structuring Reporting Threshold Lower Bound (INR):</label>
+              <input type="number" id="cfg-struct-min" value="25000" readonly>
+            </div>
+            <div class="form-row">
+              <label>Structuring Reporting Threshold Upper Bound (INR):</label>
+              <input type="number" id="cfg-struct-max" value="49999" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
 
-  <!-- Clean Floating Toast Container -->
+  <!-- Global Floating Toast Notification Container -->
   <div class="toast-wrapper" id="toast-container"></div>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=5"></script>
 </body>
 
 </html>

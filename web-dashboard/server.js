@@ -1,155 +1,102 @@
 /**
- * Web Dashboard & Real-Time Alert Broker
- * =====================================
- * Zero-dependency server using built-in Node.js modules.
- * Connects the real UPI transactions.csv dataset, stateful
- * CEP mule detection engine, and live SSE/REST dashboard at http://localhost:3000
+ * Sentinel Real-Time UPI Fraud Intelligence Platform
+ * ==================================================
+ * High-Throughput Stream Processing Server & SOC Intelligence Gateway
  */
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { getNextTransaction, injectMuleAttack } = require('../ingestion/stream_simulator');
+
+const GraphStore = require('../engine/graph_store');
+const FraudDetectionEngine = require('../engine/rules');
+const CaseManager = require('../engine/case_manager');
+const AttackSimulator = require('../engine/simulator');
+const ClickHouseClient = require('../engine/clickhouse_client');
+const { getNextTransaction, getDatasetStats, loadDataset } = require('../ingestion/stream_simulator');
 
 let PORT = parseInt(process.env.PORT || '3000', 10);
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-// In-Memory Storage & Subscriber registry
+// Core Engines
+const graphStore = new GraphStore(15000);
+const detectionEngine = new FraudDetectionEngine(graphStore);
+const caseManager = new CaseManager(graphStore);
+const clickHouse = new ClickHouseClient();
+
+// In-Memory Storage
 const dbTransactions = [];
 const dbAlerts = [];
 const activeSubscribers = new Set();
-const accountStateMap = new Map();
-let alertSeq = 0; // Monotonic counter for unique alert IDs
 
-function getOrCreateState(vpa, name = '') {
-  const key = String(vpa || '').toLowerCase().trim();
-  if (!accountStateMap.has(key)) {
-    accountStateMap.set(key, {
-      vpa: key,
-      name: name || key,
-      recentCredits: [],
-      recentDebits: [],
-      distinctSenders: new Set(),
-      upstreamSources: new Map(),
-      riskScore: 0,
-      isFlaggedMule: false
-    });
+let streamIngestionCounter = 0;
+let cumulativeVolume = 0;
+let streamIntervalMs = 400; // Default 1x: ~2.5 transactions/sec
+let isEnginePaused = false;
+let streamTimer = null;
+const serverStartTime = Date.now();
+
+// Processing Latency Tracking
+let recentLatencies = [];
+
+// Attack Simulator instance
+const simulator = new AttackSimulator((tx) => {
+  handleIngestedTx(tx);
+});
+
+function handleIngestedTx(tx) {
+  const t0 = process.hrtime.bigint();
+
+  streamIngestionCounter++;
+  if (tx.status === 'SUCCESS') {
+    cumulativeVolume += (tx.amount || 0);
   }
-  const state = accountStateMap.get(key);
-  if (name && (!state.name || state.name === key)) {
-    state.name = name;
+
+  dbTransactions.unshift(tx);
+  if (dbTransactions.length > 500) dbTransactions.pop();
+
+  // Evaluate through Detection Engine (all 6 rules)
+  const newAlerts = detectionEngine.evaluateTransaction(tx);
+
+  // Sync to ClickHouse if available
+  clickHouse.insertTransaction(tx);
+
+  // Handle new alerts
+  for (const alert of newAlerts) {
+    dbAlerts.unshift(alert);
+    if (dbAlerts.length > 500) dbAlerts.pop();
+
+    // Auto-create SOC case
+    const autoCase = caseManager.createCaseFromAlert(alert);
+
+    // Sync alert to ClickHouse
+    clickHouse.insertAlert(alert);
+
+    // Broadcast Alert via SSE
+    broadcastEvent('alert', alert);
+    broadcastEvent('case', autoCase);
   }
-  return state;
-}
 
-function evictOldState(state, currentTimeMs) {
-  const cutoff = currentTimeMs - 120000; // 2-minute sliding window
-  state.recentCredits = state.recentCredits.filter(c => c.timeMs >= cutoff);
-  state.recentDebits = state.recentDebits.filter(d => d.timeMs >= cutoff);
-}
+  const t1 = process.hrtime.bigint();
+  const latencyMs = Number(t1 - t0) / 1000000;
+  recentLatencies.push(latencyMs);
+  if (recentLatencies.length > 100) recentLatencies.shift();
 
-// Stateful In-Memory CEP Mule Detection Logic
-function processStreamEvent(tx) {
-  if (tx.status !== 'SUCCESS') return;
-
-  const eventTimeMs = tx.stream_time_ms || Date.now();
-  const senderState = getOrCreateState(tx.sender_vpa, tx.sender_name);
-  const receiverState = getOrCreateState(tx.receiver_vpa, tx.receiver_name);
-
-  evictOldState(senderState, eventTimeMs);
-  evictOldState(receiverState, eventTimeMs);
-
-  // 1. Inflow to Receiver
-  receiverState.recentCredits.push({
-    txId: tx.transaction_id,
-    amount: tx.amount,
-    fromVpa: tx.sender_vpa,
-    fromName: tx.sender_name,
-    timeMs: eventTimeMs
+  // Broadcast Transaction via SSE
+  broadcastEvent('transaction', {
+    ...tx,
+    stream_counter: streamIngestionCounter,
+    cumulative_volume: cumulativeVolume,
+    total_alerts: dbAlerts.length,
+    active_mules: detectionEngine.getAllFlaggedMules().length,
+    avg_latency_ms: getAverageLatency()
   });
-  receiverState.distinctSenders.add(tx.sender_vpa);
-  receiverState.upstreamSources.set(tx.sender_vpa, { timeMs: eventTimeMs, amount: tx.amount });
-
-  // 2. Outflow from Sender
-  senderState.recentDebits.push({
-    txId: tx.transaction_id,
-    amount: tx.amount,
-    toVpa: tx.receiver_vpa,
-    toName: tx.receiver_name,
-    timeMs: eventTimeMs
-  });
-
-  // --- Pattern 1: Rapid In-to-Out Pass-Through Mule (Layering) ---
-  if (senderState.recentCredits.length > 0) {
-    const totalInflow = senderState.recentCredits.reduce((sum, c) => sum + c.amount, 0);
-    const lastCredit = senderState.recentCredits[senderState.recentCredits.length - 1];
-    const timeDeltaSeconds = (eventTimeMs - lastCredit.timeMs) / 1000;
-    const drainRatio = (tx.amount / totalInflow) * 100;
-
-    // Trigger rule if drained within 60 seconds with >= 70% drain ratio
-    if (timeDeltaSeconds >= 0 && timeDeltaSeconds <= 60 && drainRatio >= 70 && tx.amount >= 5000) {
-      senderState.isFlaggedMule = true;
-      const isCritical = timeDeltaSeconds <= 15;
-      senderState.riskScore = Math.min(99, 75 + Math.round((60 - timeDeltaSeconds) * 0.4));
-
-      emitAlert({
-        alert_id: 'ALT-' + (++alertSeq).toString().padStart(4, '0') + '-' + Date.now().toString().slice(-5),
-        alert_time: new Date().toLocaleTimeString(),
-        rule_code: 'RAPID_PASS_THROUGH_MULE',
-        severity: isCritical ? 'CRITICAL' : 'HIGH',
-        risk_score: senderState.riskScore,
-        suspect_vpa: tx.sender_vpa,
-        suspect_name: senderState.name,
-        source_vpa: `${lastCredit.fromName} (${lastCredit.fromVpa})`,
-        target_vpa: `${tx.receiver_name} (${tx.receiver_vpa})`,
-        hop_count: 2,
-        time_to_drain_seconds: parseFloat(timeDeltaSeconds.toFixed(1)),
-        drain_percentage: parseFloat(drainRatio.toFixed(1)),
-        amount_drained: tx.amount,
-        bank: tx.bank_code,
-        location: tx.location,
-        details: `Drained ${drainRatio.toFixed(1)}% (₹${tx.amount.toLocaleString('en-IN')}) of received funds in ${timeDeltaSeconds.toFixed(1)}s`
-      });
-    }
-  }
-
-  // --- Pattern 2: Fan-in Smurfing Aggregator Mule ---
-  if (receiverState.distinctSenders.size >= 3 && !receiverState.smurfingAlerted) {
-    receiverState.smurfingAlerted = true;
-    receiverState.isFlaggedMule = true;
-    receiverState.riskScore = 94;
-    const totalAggregated = receiverState.recentCredits.reduce((s, c) => s + c.amount, 0);
-
-    emitAlert({
-      alert_id: 'ALT-' + (++alertSeq).toString().padStart(4, '0') + '-' + Date.now().toString().slice(-5),
-      alert_time: new Date().toLocaleTimeString(),
-      rule_code: 'FAN_IN_SMURFING_AGGREGATOR',
-      severity: 'CRITICAL',
-      risk_score: 94,
-      suspect_vpa: tx.receiver_vpa,
-      suspect_name: receiverState.name,
-      source_vpa: `Multiple Victims (${receiverState.distinctSenders.size} remitters)`,
-      target_vpa: tx.receiver_vpa,
-      hop_count: 1,
-      time_to_drain_seconds: 0,
-      drain_percentage: 0,
-      amount_drained: totalAggregated,
-      bank: tx.bank_code,
-      location: tx.location,
-      details: `Received ₹${totalAggregated.toLocaleString('en-IN')} from ${receiverState.distinctSenders.size} distinct remitters in under 2 minutes`
-    });
-  }
 }
 
-function emitAlert(alert) {
-  dbAlerts.unshift(alert);
-  if (dbAlerts.length > 500) dbAlerts.pop();
-
-  console.log(`\n🚨 [ALERT] ${alert.rule_code} | Severity: ${alert.severity} (Risk: ${alert.risk_score}/100)`);
-  console.log(`   Suspect: ${alert.suspect_name} <${alert.suspect_vpa}>`);
-  console.log(`   Speed  : ${alert.time_to_drain_seconds}s Drain | ${alert.details}`);
-
-  broadcastEvent('alert', alert);
+function getAverageLatency() {
+  if (recentLatencies.length === 0) return 0.5;
+  const sum = recentLatencies.reduce((a, b) => a + b, 0);
+  return parseFloat((sum / recentLatencies.length).toFixed(2));
 }
 
 function broadcastEvent(type, data) {
@@ -163,52 +110,76 @@ function broadcastEvent(type, data) {
   });
 }
 
-function handleIngestedTx(tx) {
-  dbTransactions.unshift(tx);
-  if (dbTransactions.length > 1000) dbTransactions.pop();
+function startStreamTimer() {
+  if (streamTimer) clearInterval(streamTimer);
+  streamTimer = setInterval(() => {
+    if (isEnginePaused) return;
+    const tx = getNextTransaction();
+    if (tx) {
+      handleIngestedTx(tx);
+    }
+  }, streamIntervalMs);
+}
 
-  processStreamEvent(tx);
-  broadcastEvent('transaction', tx);
+// REST Request Helper: Parse JSON Body
+function parseJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
 }
 
 // HTTP Server
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  // Favicon handler
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (url.pathname === '/favicon.ico') {
     res.writeHead(204);
     res.end();
     return;
   }
 
-  // SSE Stream Endpoint
+  // ========================================================
+  // 1. SSE Stream Gateway
+  // ========================================================
   if (url.pathname === '/api/stream') {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*'
+      'Connection': 'keep-alive'
     });
     res.write('retry: 2000\n\n');
 
-    // Replay any alerts already in buffer so a late-connecting browser sees them immediately
+    // Replay up to 30 recent alerts
     if (dbAlerts.length > 0) {
-      const replaySlice = dbAlerts.slice(0, 50); // send up to 50 historical alerts
-      replaySlice.reverse().forEach(alert => {
-        try {
-          res.write(`event: alert\ndata: ${JSON.stringify(alert)}\n\n`);
-        } catch (_) {}
+      dbAlerts.slice(0, 30).reverse().forEach(alert => {
+        try { res.write(`event: alert\ndata: ${JSON.stringify(alert)}\n\n`); } catch (_) {}
       });
     }
 
-    // Replay last 20 transactions so the feed isn't empty
+    // Replay up to 15 recent transactions
     if (dbTransactions.length > 0) {
-      const txSlice = dbTransactions.slice(0, 20);
-      txSlice.reverse().forEach(tx => {
-        try {
-          res.write(`event: transaction\ndata: ${JSON.stringify(tx)}\n\n`);
-        } catch (_) {}
+      dbTransactions.slice(0, 15).reverse().forEach(tx => {
+        try { res.write(`event: transaction\ndata: ${JSON.stringify(tx)}\n\n`); } catch (_) {}
       });
     }
 
@@ -217,37 +188,377 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // REST API: Trigger Manual Mule Ring Attack
-  if (url.pathname === '/api/inject-mule') {
-    injectMuleAttack(handleIngestedTx);
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'Mule ring attack triggered' }));
-    return;
-  }
-
-  // REST API: Live Aggregated Metrics
+  // ========================================================
+  // 2. High-Level Metrics & Telemetry
+  // ========================================================
   if (url.pathname === '/api/stats') {
-    const totalVolume = dbTransactions.reduce((acc, t) => acc + (t.amount || 0), 0);
+    const datasetStats = getDatasetStats();
     const criticalAlerts = dbAlerts.filter(a => a.severity === 'CRITICAL').length;
+    const highAlerts = dbAlerts.filter(a => a.severity === 'HIGH').length;
+    const flaggedMules = detectionEngine.getAllFlaggedMules();
+    const quarantined = caseManager.getQuarantinedAccounts();
+    const uptimeSec = Math.round((Date.now() - serverStartTime) / 1000);
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
-      totalTransactions: dbTransactions.length,
+      streamIngestionCounter,
+      cumulativeVolume,
+      datasetTotalRows: datasetStats.totalRows,
+      datasetTotalVolume: datasetStats.totalVolume,
       totalAlerts: dbAlerts.length,
       criticalAlerts,
-      totalVolumeRupees: totalVolume,
-      activeMulesCount: Array.from(accountStateMap.values()).filter(s => s.isFlaggedMule).length
+      highAlerts,
+      activeMulesCount: flaggedMules.length,
+      quarantinedCount: quarantined.length,
+      avgLatencyMs: getAverageLatency(),
+      uptimeSeconds: uptimeSec,
+      isPaused: isEnginePaused,
+      currentSpeedMs: streamIntervalMs,
+      clickhouseConnected: clickHouse.isAvailable,
+      graphStats: {
+        nodesCount: graphStore.nodes.size,
+        edgesCount: graphStore.edges.length
+      }
     }));
     return;
   }
 
-  // REST API: Get All Alerts
-  if (url.pathname === '/api/alerts') {
+  // ========================================================
+  // 3. Transactions Query API
+  // ========================================================
+  if (url.pathname === '/api/transactions') {
+    const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+    const query = (url.searchParams.get('q') || '').toLowerCase();
+    const status = (url.searchParams.get('status') || 'ALL').toUpperCase();
+
+    let list = dbTransactions;
+    if (status !== 'ALL') {
+      list = list.filter(t => t.status === status);
+    }
+    if (query) {
+      list = list.filter(t =>
+        (t.sender_name && t.sender_name.toLowerCase().includes(query)) ||
+        (t.sender_vpa && t.sender_vpa.toLowerCase().includes(query)) ||
+        (t.receiver_name && t.receiver_name.toLowerCase().includes(query)) ||
+        (t.receiver_vpa && t.receiver_vpa.toLowerCase().includes(query)) ||
+        (t.bank_code && t.bank_code.toLowerCase().includes(query)) ||
+        (t.location && t.location.toLowerCase().includes(query)) ||
+        (t.transaction_id && t.transaction_id.toLowerCase().includes(query))
+      );
+    }
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(dbAlerts));
+    res.end(JSON.stringify(list.slice(0, limit)));
     return;
   }
 
-  // Serve static UI assets
+  // ========================================================
+  // 4. Alerts Query API
+  // ========================================================
+  if (url.pathname === '/api/alerts') {
+    const limit = parseInt(url.searchParams.get('limit') || '100', 10);
+    const rule = url.searchParams.get('rule');
+    const severity = url.searchParams.get('severity');
+
+    let list = dbAlerts;
+    if (rule && rule !== 'ALL') list = list.filter(a => a.rule_code === rule);
+    if (severity && severity !== 'ALL') list = list.filter(a => a.severity === severity);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(list.slice(0, limit)));
+    return;
+  }
+
+  // ========================================================
+  // 5. Case Management APIs
+  // ========================================================
+  if (url.pathname === '/api/cases') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(caseManager.getAllCases()));
+    return;
+  }
+
+  if (url.pathname === '/api/cases/status' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const updated = caseManager.updateCaseStatus(body.caseId, body.status, body.analyst, body.comment);
+      if (!updated) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Case not found' }));
+        return;
+      }
+      broadcastEvent('case_update', updated);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(updated));
+    } catch (err) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  if (url.pathname === '/api/cases/note' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const note = caseManager.addNote(body.caseId, body.author, body.text);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(note));
+    } catch (err) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ========================================================
+  // 6. Account 360 Dossier & Quarantine APIs
+  // ========================================================
+  if (url.pathname.startsWith('/api/account/')) {
+    const rawVpa = decodeURIComponent(url.pathname.replace('/api/account/', ''));
+
+    if (url.pathname.endsWith('/quarantine') && req.method === 'POST') {
+      const vpa = decodeURIComponent(rawVpa.replace('/quarantine', ''));
+      const body = await parseJsonBody(req);
+      const isQuarantined = caseManager.isQuarantined(vpa);
+
+      let record = null;
+      if (isQuarantined) {
+        caseManager.unquarantineAccount(vpa, body.analyst || 'SOC Analyst');
+      } else {
+        record = caseManager.quarantineAccount(vpa, body.reason, body.analyst || 'SOC Analyst');
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ vpa, isQuarantined: !isQuarantined, record }));
+      return;
+    }
+
+    const vpa = rawVpa.toLowerCase().trim();
+    const node = graphStore.getNode(vpa);
+    const accountState = detectionEngine.getAccountState(vpa);
+    const isQuarantined = caseManager.isQuarantined(vpa);
+    const accountAlerts = dbAlerts.filter(a => a.suspect_vpa.toLowerCase() === vpa);
+    const accountCases = caseManager.getAllCases().filter(c => c.suspectVpa.toLowerCase() === vpa);
+
+    // Connected counter-parties
+    const outEdges = (graphStore.adjList.get(vpa) || []).slice(-10);
+    const inEdges = (graphStore.reverseAdjList.get(vpa) || []).slice(-10);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      vpa,
+      node: node || { vpa, name: vpa, bank: 'UPI', location: 'India' },
+      state: accountState,
+      isQuarantined,
+      alerts: accountAlerts,
+      cases: accountCases,
+      counterparties: {
+        sentTo: outEdges,
+        receivedFrom: inEdges
+      }
+    }));
+    return;
+  }
+
+  // ========================================================
+  // 7. Network Graph Visualization API (Cytoscape JSON)
+  // ========================================================
+  if (url.pathname === '/api/network/graph') {
+    const focusVpa = url.searchParams.get('focus');
+    const limit = parseInt(url.searchParams.get('limit') || '80', 10);
+    const graphData = graphStore.getGraphVisualizationData(focusVpa, limit);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(graphData));
+    return;
+  }
+
+  if (url.pathname === '/api/network/top-suspects') {
+    const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(graphStore.getTopSuspiciousAccounts(limit)));
+    return;
+  }
+
+  // ========================================================
+  // 8. Analytics & Reporting API
+  // ========================================================
+  if (url.pathname === '/api/analytics') {
+    // 1. Bank Risk Breakdown
+    const bankCounts = {};
+    dbTransactions.forEach(t => {
+      const b = t.bank_code || 'OTHER';
+      bankCounts[b] = (bankCounts[b] || 0) + 1;
+    });
+
+    // 2. City / Geographic Breakdown
+    const cityCounts = {};
+    dbTransactions.forEach(t => {
+      const c = t.location || 'India';
+      cityCounts[c] = (cityCounts[c] || 0) + 1;
+    });
+
+    // 3. Rule Performance Breakdown
+    const ruleCounts = {};
+    dbAlerts.forEach(a => {
+      ruleCounts[a.rule_code] = (ruleCounts[a.rule_code] || 0) + 1;
+    });
+
+    // 4. Severity Distribution
+    const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0 };
+    dbAlerts.forEach(a => {
+      if (severityCounts[a.severity] !== undefined) severityCounts[a.severity]++;
+    });
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      bankDistribution: bankCounts,
+      cityDistribution: cityCounts,
+      rulePerformance: ruleCounts,
+      severityDistribution: severityCounts,
+      totalAlerts: dbAlerts.length,
+      totalTransactions: dbTransactions.length
+    }));
+    return;
+  }
+
+  // ========================================================
+  // 9. Attack Scenario Simulation APIs
+  // ========================================================
+  if (url.pathname === '/api/simulate/rapid-pass-through') {
+    const result = simulator.injectRapidPassThrough();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  if (url.pathname === '/api/simulate/fan-in-smurfing') {
+    const result = simulator.injectFanInSmurfing();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  if (url.pathname === '/api/simulate/fan-out-distribution') {
+    const result = simulator.injectFanOutDistribution();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  if (url.pathname === '/api/simulate/multi-hop-chain') {
+    const result = simulator.injectMultiHopChain();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  if (url.pathname === '/api/simulate/circular-loop') {
+    const result = simulator.injectCircularLoop();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  if (url.pathname === '/api/simulate/structuring-split') {
+    const result = simulator.injectStructuringSplit();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  // Legacy compatibility for simple button
+  if (url.pathname === '/api/inject-mule') {
+    const result = simulator.injectRapidPassThrough();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Triggered', ...result }));
+    return;
+  }
+
+  // ========================================================
+  // 10. Stream Controls (Speed, Pause, Resume, Reset)
+  // ========================================================
+  if (url.pathname === '/api/speed') {
+    const sp = url.searchParams.get('val') || '1x';
+    if (sp === '50x') streamIntervalMs = 8;
+    else if (sp === '20x') streamIntervalMs = 20;
+    else if (sp === '5x') streamIntervalMs = 80;
+    else streamIntervalMs = 400; // 1x
+
+    startStreamTimer();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ speed: sp, intervalMs: streamIntervalMs }));
+    return;
+  }
+
+  if (url.pathname === '/api/stream/pause') {
+    isEnginePaused = true;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ isPaused: true }));
+    return;
+  }
+
+  if (url.pathname === '/api/stream/resume') {
+    isEnginePaused = false;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ isPaused: false }));
+    return;
+  }
+
+  if (url.pathname === '/api/stream/reset') {
+    dbTransactions.length = 0;
+    dbAlerts.length = 0;
+    graphStore.reset();
+    detectionEngine.reset();
+    streamIngestionCounter = 0;
+    cumulativeVolume = 0;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'Stream state reset' }));
+    return;
+  }
+
+  // ========================================================
+  // 11. Forensic Report Export (JSON / CSV)
+  // ========================================================
+  if (url.pathname === '/api/export') {
+    const format = url.searchParams.get('format') || 'json';
+    if (format === 'csv') {
+      const headers = ['alert_id', 'alert_timestamp', 'rule_code', 'severity', 'risk_score', 'suspect_vpa', 'source_vpa', 'target_vpa', 'amount_drained', 'time_to_drain_seconds', 'drain_percentage'];
+      let csv = headers.join(',') + '\n';
+      dbAlerts.forEach(a => {
+        csv += [
+          `"${a.alert_id}"`,
+          `"${a.alert_timestamp || ''}"`,
+          `"${a.rule_code}"`,
+          `"${a.severity}"`,
+          a.risk_score,
+          `"${a.suspect_vpa}"`,
+          `"${a.source_vpa || ''}"`,
+          `"${a.target_vpa || ''}"`,
+          a.amount_drained || 0,
+          a.time_to_drain_seconds || 0,
+          a.drain_percentage || 0
+        ].join(',') + '\n';
+      });
+      res.writeHead(200, {
+        'Content-Type': 'text/csv',
+        'Content-Disposition': 'attachment; filename="sentinel_fraud_report.csv"'
+      });
+      res.end(csv);
+      return;
+    }
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Content-Disposition': 'attachment; filename="sentinel_fraud_report.json"'
+    });
+    res.end(JSON.stringify(dbAlerts, null, 2));
+    return;
+  }
+
+  // ========================================================
+  // 12. Static Assets Serving
+  // ========================================================
   let filePath = path.join(PUBLIC_DIR, url.pathname === '/' ? 'index.html' : url.pathname);
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
     const ext = path.extname(filePath);
@@ -256,15 +567,16 @@ const server = http.createServer((req, res) => {
       '.css': 'text/css',
       '.js': 'application/javascript',
       '.json': 'application/json',
-      '.svg': 'image/svg+xml'
+      '.svg': 'image/svg+xml',
+      '.png': 'image/png'
     };
     res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' });
     fs.createReadStream(filePath).pipe(res);
     return;
   }
 
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Not Found');
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Endpoint Not Found', path: url.pathname }));
 });
 
 server.on('error', (err) => {
@@ -278,30 +590,18 @@ server.on('error', (err) => {
 });
 
 server.listen(PORT, () => {
+  const stats = getDatasetStats();
   console.log(`\n======================================================`);
-  console.log(`🚀 REAL-TIME UPI FRAUD & MULE STREAM SENTINEL`);
-  console.log(`   Interactive Dashboard : http://localhost:${PORT}`);
-  console.log(`   Dataset Source        : data/transactions.csv`);
-  console.log(`   Stream Status         : ACTIVE`);
+  console.log(`🛡️  SENTINEL NEXT-GEN FINANCIAL FRAUD INTELLIGENCE SOC`);
+  console.log(`   Interactive Platform : http://localhost:${PORT}`);
+  console.log(`   Dataset Source       : data/transactions.csv (${stats.totalRows} Transactions)`);
+  console.log(`   Total Dataset Volume : ₹${Math.round(stats.totalVolume).toLocaleString('en-IN')}`);
+  console.log(`   Stream Status        : ACTIVE (2.5 tx/sec @ 1x)`);
+  console.log(`   Detection Engine     : 6 Multi-Pattern CEP Rules Active`);
   console.log(`======================================================\n`);
 
-  // Continuously stream transactions from data/transactions.csv every 450ms
-  setInterval(() => {
-    const tx = getNextTransaction();
-    if (tx) {
-      handleIngestedTx(tx);
-    }
-  }, 450);
-
-  // Auto-trigger a live mule attack 3 seconds after startup
-  // This ensures the browser sees real detections even if it connects after the CSV mule rows passed
-  setTimeout(() => {
-    console.log('\n[Auto-Demo] Firing startup mule attack demo for dashboard...');
-    injectMuleAttack(handleIngestedTx);
-  }, 3000);
-
-  // Fire another mule attack every 60 seconds to keep the dashboard active
-  setInterval(() => {
-    injectMuleAttack(handleIngestedTx);
-  }, 60000);
+  startStreamTimer();
 });
+
+module.exports = { server, getPort: () => PORT };
+

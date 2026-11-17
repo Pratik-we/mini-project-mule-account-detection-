@@ -1,212 +1,247 @@
-# 📖 Detailed Project Documentation: Real-Time UPI & Mule Account Stream Detector
+# 📖 Comprehensive Technical Architecture & Platform Handbook: Sentinel Real-Time UPI & Mule Account Platform
 
 ---
 
-## 📌 1. Project Overview & Objective
+## 📌 1. Project Mission & Enterprise Overview
 
-### What is this project?
-This project is an **enterprise-grade, real-time streaming fraud detection system** specifically designed to detect **Money Mule Networks, Rapid In-to-Out Fund Draining, Smurfing, and Multi-Hop Layering Attacks** across UPI (Unified Payments Interface) and instant banking rails.
+### What is Sentinel?
+Sentinel is an **enterprise-grade, real-time streaming financial cyber-intelligence platform** specifically engineered to detect, investigate, and visually untangle **Money Mule Networks, Rapid In-to-Out Fund Draining, Fan-In Smurfing Aggregation, Fan-Out Dispersal, Multi-Hop Layering Chains, Circular Transaction Loops, and Structuring Evasion** across UPI (Unified Payments Interface) and instant digital payment systems.
 
-### What problem does it solve?
-In modern digital banking and UPI scams:
-1. Fraudsters trick victims into transferring money into a compromised bank account (**Mule Account Tier-1**).
-2. Within seconds (often $< 15$ to $60$ seconds), the mule forwards the money to another intermediary account (**Mule Tier-2** or **Tier-3**) or off-ramps it into cryptocurrency / ATM withdrawals.
-3. Traditional batch fraud detection systems (which run overnight SQL queries or hourly jobs) detect the fraud **hours too late**, after the funds have already left the banking system.
-4. **This system detects the mule in sub-second latency** the moment the outflow transaction occurs, calculating the **Time-to-Drain** velocity and **Drain Percentage** in real time.
+### The Operational Challenge in Instant Digital Payments
+In contemporary digital banking and UPI scams:
+1. **Victim Inflow**: Fraudsters coerce or trick victims into transferring money into a compromised account (**Tier-1 Money Mule**).
+2. **Sub-Minute Layering**: Within seconds (often $< 15$ to $60$ seconds), the mule forwards the money to intermediary mules (**Tier-2 / Tier-3**) or disperses it across multiple runners.
+3. **Rapid Liquidation**: Funds are off-ramped via ATM cardless withdrawals, hawala syndicates, or P2P crypto merchants before traditional batch systems can run overnight queries.
+4. **The Latency Problem**: Traditional fraud batch engines that run hourly or overnight SQL jobs discover the crime **hours too late**, after the funds have irreversibly departed the formal banking rails.
+5. **Sentinel's Solution**: Sentinel evaluates transactions in stream time with **sub-millisecond latency** the moment an outflow occurs, computing exact **Time-to-Drain** velocity, **Drain Percentage**, graph degree centrality, and multi-hop paths in real time.
 
 ---
 
 ## 📊 2. Dataset Specification (`data/transactions.csv`)
 
-The system directly ingests and processes `data/transactions.csv`. It contains 9,000+ real-world and synthetic UPI transactions adhering to the following schema:
+The platform ingests `data/transactions.csv`, containing **9,077 real-world and synthetic UPI transactions** (8,579 SUCCESS, 498 FAILED):
 
 | Column | Type | Description | Example |
 | :--- | :--- | :--- | :--- |
 | `transaction_id` | String | Unique transaction reference identifier | `099ee548-2fc1-4811-bf92-559c467ca792` |
 | `timestamp` | String/DateTime | Transaction occurrence time (`YYYY-MM-DD HH:mm:ss`) | `2024-06-19 06:04:49` |
-| `sender_name` | String | Name of the remitter / payer | `Mohanlal Bakshi` |
+| `sender_name` | String | Legal name of remitter | `Mohanlal Bakshi` |
 | `sender_vpa` | String | Virtual Payment Address of sender | `8908837379@okaxis` |
-| `receiver_name` | String | Name of the beneficiary / payee | `Mehul Sankaran` |
+| `receiver_name` | String | Legal name of payee / beneficiary | `Mehul Sankaran` |
 | `receiver_vpa` | String | Virtual Payment Address of receiver | `7683454560@okaxis` |
 | `amount` | Float | Transferred amount in Indian Rupees (₹) | `8404.55` |
 | `status` | String | Transfer status (`SUCCESS` or `FAILED`) | `SUCCESS` |
-| `bank_code` | String | Participating bank code | `AXIS`, `HDFCBANK`, `ICICI`, `SBI`, `YBL` |
+| `bank_code` | String | Participating PSP bank | `AXIS`, `HDFCBANK`, `ICICI`, `SBI`, `YBL` |
 | `location` | String | Transaction origination city / region | `Delhi`, `Mumbai`, `Ahmedabad`, `Pune` |
 
-> **Note**: Failed transactions (`status === 'FAILED'`) are filtered out during evaluation because no funds are settled.
+> **Settlement Gate**: Transactions with `status === 'FAILED'` are tracked for velocity telemetry but filtered from drain ratio calculations because zero financial value settled.
 
 ---
 
-## 🔄 3. Dual-Engine Architecture (How It Runs)
+## 🔄 3. Dual-Engine Architecture
 
-The system is architected with dual operating modes for maximum flexibility:
+Sentinel is architected with dual operating modes for maximum flexibility and demonstration readiness:
 
-| Feature | Mode 1: Zero-Dependency Standalone Mode | Mode 2: Distributed Production Mode |
+| Capability | Mode 1: Zero-Dependency High-Performance Core | Mode 2: Distributed Production Cluster |
 | :--- | :--- | :--- |
-| **Requirements** | Node.js only (v16+) | Docker Desktop (Docker Compose) |
-| **Pipeline Stack** | Pure Node.js in-memory stream processor | Apache Kafka (KRaft) + Apache Flink + ClickHouse |
-| **State Storage** | JavaScript `Map` with 2-minute sliding window | RocksDB state backend with checkpointing |
-| **Data Delivery** | Server-Sent Events (SSE) directly to browser | Kafka topics + ClickHouse Materialized Views |
-| **Primary Use Case**| Rapid prototyping, team collaboration without Docker, UI design | High-throughput distributed benchmark, production deployment |
+| **Runtime Requirements** | Native Node.js (v16+) | Docker Desktop (Docker Compose) |
+| **Stream Engine** | In-Memory Sliding-Window CEP Engine | Apache Flink 1.17 (Java & PyFlink) |
+| **Message Queue** | In-Process Event Streamer + SSE Gateway | Apache Kafka 7.5.0 (KRaft Mode) |
+| **Graph Store** | In-Memory Directed Graph Store | ClickHouse Graph Queries & In-Memory Index |
+| **Storage Backend** | JSON State Store (`cases.json`, `quarantined_accounts.json`) | ClickHouse 23.8 ReplacingMergeTree |
+| **Primary Use Case** | Rapid local deployment, live SOC demonstration, zero-socket testing | High-volume distributed benchmarks & production scaling |
 
 ---
 
-## 🗂️ 4. Comprehensive File-by-File Breakdown
+## 🗂️ 4. File-by-File Architecture Breakdown
 
 ```
-MP/
-├── config/                                 # Configuration & cluster tuning
-│   ├── default.env                         # Environment variables (ports, brokers)
-│   └── flink-conf.yaml                     # Apache Flink cluster & state backend config
-├── docker/                                 # Production container definitions
-│   └── docker-compose.yml                  # Kafka (KRaft), Flink, ClickHouse stack
-├── data/                                   # Datasets and generated reports
-│   ├── transactions.csv                    # Ingested UPI transaction dataset (9,000+ rows)
-│   └── alerts_output.json                  # Output analysis report from dataset streamer
-├── clickhouse/                             # Columnar database schemas & analytics
-│   ├── init.sql                            # Tables, Kafka engines & Materialized Views
-│   └── queries.sql                         # Sub-second SOC analyst analytical queries
-├── flink-jobs/                             # Distributed stream processing code
-│   ├── python/                             # PyFlink implementation
-│   │   ├── requirements.txt                # Python dependencies (apache-flink)
-│   │   └── mule_stream_detector.py         # PyFlink KeyedProcessFunction pipeline
-│   └── java/                               # Production Java Flink implementation
-│       ├── pom.xml                         # Maven dependencies & build packaging
-│       └── src/main/java/com/upi/fraud/
-│           ├── FraudDetectionJob.java      # Main Flink pipeline topology
-│           ├── model/
-│           │   ├── TransactionEvent.java   # UPI transaction POJO / Data model
-│           │   └── MuleAlert.java          # Fraud alert POJO / Data model
-│           └── operators/
-│               ├── RapidPassThroughDetector.java # Keyed stateful pass-through detector
-│               └── MultiHopChainDetector.java    # Multi-hop layering chain correlator
-├── ingestion/                              # Data generators and dataset ingestors
-│   ├── stream_simulator.js                 # Dataset stream reader & live attack injector
-│   └── dataset_streamer.js                 # Batch dataset scanner for transactions.csv
-├── web-dashboard/                          # Web UI & Real-Time Alert Broker
-│   ├── server.js                           # Zero-dependency HTTP & SSE server
+MP1/
+├── engine/                                  # Core Detection & Graph Intelligence
+│   ├── rules.js                             # 6 Stateful CEP Fraud Detection Rules
+│   ├── risk_scorer.js                       # Explainable Multi-Signal Risk Scorer (0-100)
+│   ├── graph_store.js                       # Directed Transaction Graph Store & Cycle Tracker
+│   ├── case_manager.js                      # SOC Case Lifecycle & Quarantine Enforcement
+│   ├── simulator.js                         # 6-Scenario Attack Simulation Engine
+│   └── clickhouse_client.js                 # Sub-second ClickHouse HTTP OLAP Client
+├── web-dashboard/                           # Real-Time SOC Interface & API Broker
+│   ├── server.js                            # High-Throughput HTTP & SSE Gateway
 │   └── public/
-│       ├── index.html                      # Real-time SOC analyst dashboard
-│       ├── styles.css                      # Cyber-security dark theme styling
-│       └── app.js                          # Client-side SSE listener & event renderer
-└── Explain.md                              # (This file) Complete technical documentation
+│       ├── index.html                       # 9-View Security Operations Center Dashboard
+│       ├── styles.css                       # Enterprise Dark Cybersecurity Styling
+│       └── app.js                           # Canvas Graph Visualizer & State Controller
+├── tests/                                   # Automated Validation Test Suites
+│   ├── test_detection_engine.js             # Engine, Risk Scorer & Graph Unit Tests (7/7 Pass)
+│   └── test_server_mock.js                  # Zero-Socket REST API Route Tests (9/9 Pass)
+├── ingestion/                               # Dataset Streamers & Batch Processors
+│   ├── dataset_streamer.js                  # Batch Scanner for transactions.csv
+│   └── stream_simulator.js                  # Live Sequential Replay Generator
+├── flink-jobs/                              # Distributed Stream Processing
+│   ├── java/                                # Production Java Flink 1.17 Topology
+│   └── python/                              # PyFlink KeyedProcessFunction Pipeline
+├── clickhouse/                              # OLAP Storage & Analytical Queries
+│   ├── init.sql                             # Database & Materialized View DDL
+│   └── queries.sql                          # Sub-second Analytical Queries
+├── data/                                    # Datasets & Reports
+│   ├── transactions.csv                     # 9,077 UPI Transaction Records
+│   └── alerts_output.json                   # Output Incident Ledger
+├── docker/                                  # Containerized Stack Definitions
+│   └── docker-compose.yml                   # Kafka (KRaft), Flink, ClickHouse Stack
+├── README.md                                # Platform Architectural Specification
+└── Explain.md                               # (This File) Comprehensive Handbook
 ```
 
 ---
 
-## 🔬 5. Detailed Component Explanations
+## 🧠 5. Fraud Detection Algorithms & Mathematical Models
 
-### 5.1 Ingestion Layer (`ingestion/`)
-
-#### 📄 `ingestion/dataset_streamer.js`
-* **What it does**: Reads `data/transactions.csv`, normalizes all 10 columns, tracks account inflow/outflow states, and detects money mule patterns.
-* **Key Features**:
-  * **Intelligent Normalization (`normalizeRecord`)**: Maps names, VPAs, amounts, status, bank codes, and locations cleanly.
-  * **Status Filtering**: Ignores `FAILED` transactions and only evaluates settled money movements.
-  * **Pattern Detection**:
-    1. `RAPID_PASS_THROUGH_MULE`: Catches accounts where money enters and drains out ($\ge 70\%$ drain ratio) within $<120$ seconds (or $<20$ seconds for CRITICAL).
-    2. `FAN_IN_SMURFING_AGGREGATOR`: Catches accounts receiving transfers from $\ge 3$ distinct remitter victims within the time window.
-  * **Output**: Produces formatted console output and writes `data/alerts_output.json`.
-
-#### 📄 `ingestion/stream_simulator.js`
-* **What it does**: Connects `data/transactions.csv` to the real-time server.
-* **Key Functions**:
-  * `loadDataset()`: Loads and parses `data/transactions.csv`.
-  * `getNextTransaction()`: Fetches the next sequential transaction from the dataset and timestamps it for real-time streaming.
-  * `injectMuleAttack(callback)`: Fires a coordinated multi-hop attack across dataset accounts (Victim $\to$ Mule 1 $\to$ Mule 2 $\to$ Crypto Cashout) with sub-3-second latency per hop to trigger instant alerts on the dashboard.
-
----
-
-### 5.2 Web Dashboard & Real-Time Broker (`web-dashboard/`)
-
-#### 📄 `web-dashboard/server.js`
-* **What it does**: Zero-dependency Node.js server powering the live Security Operations Center (SOC) dashboard.
-* **How it works**:
-  1. **HTTP Server**: Serves static assets (`index.html`, `styles.css`, `app.js`) on port `3000`.
-  2. **SSE Gateway (`/api/stream`)**: Pushes live transactions and alerts over Server-Sent Events to connected browsers.
-  3. **Stateful In-Memory CEP Engine**:
-     * Tracks account balance delta, recent credits, debits, and unique remitter sets.
-     * Evaluates incoming transactions against sliding-window rules.
-  4. **Continuous Dataset Streaming**: Emits a transaction from `data/transactions.csv` every 450 ms.
-  5. **REST Endpoints**:
-     * `GET /api/stats`: Sub-second KPI metrics (total volume, alert counts, active mules).
-     * `GET /api/alerts`: JSON list of all detected alerts.
-     * `GET /api/inject-mule`: Triggers the live coordinated attack.
-
-#### 📄 `web-dashboard/public/index.html`, `styles.css`, `app.js`
-* **What it does**: The frontend SOC dashboard.
-* **Features**:
-  * Live KPI Counters: Total Transactions, Flagged Mule Alerts, Critical Velocity Drains ($<15$s), Active Mules under watch.
-  * Real-Time Mule Ring Alerts Feed (displaying suspect name & VPA, severity badge, risk score / 100, flow path, drain speed, bank, and city).
-  * Live Keyed Transaction Feed showing sender $\to$ receiver, amount, bank badge, city, and transaction ID.
-  * 1-Click Button: **🚨 Inject Mule Ring Attack**.
-
----
-
-### 5.3 Production Stream Processing Layer (`flink-jobs/`)
-
-#### 📄 `flink-jobs/python/mule_stream_detector.py`
-* **What it does**: The PyFlink (Apache Flink Python API) implementation of the detection pipeline.
-* **How it works**:
-  * Uses `KeyedProcessFunction` keyed by account VPA.
-  * Maintains state of recent credits and sets event-time timers for velocity evaluation.
-
-#### 📄 `flink-jobs/java/src/main/java/com/upi/fraud/`
-* **`FraudDetectionJob.java`**: The main Java Flink entry point with checkpointing and bounded out-of-orderness watermarks.
-* **`operators/RapidPassThroughDetector.java`**: Java implementation of the sliding state machine.
-* **`operators/MultiHopChainDetector.java`**: Flink CEP (Complex Event Processing) pattern matcher detecting chained sequence transitions ($A \to B \to C \to D$).
-
----
-
-### 5.4 Storage & Containerization (`clickhouse/` & `docker/`)
-
-* **`clickhouse/init.sql`**: Schema for `fraud_stream.upi_transactions` and `fraud_stream.mule_alerts`, integrated with Kafka via Materialized Views.
-* **`clickhouse/queries.sql`**: Fast analytical queries for mule ring identification.
-* **`docker/docker-compose.yml`**: Spawns Kafka (KRaft), Flink, and ClickHouse.
-
----
-
-## 🧠 6. Fraud Detection Algorithms & Formulas
-
-### 1. Rapid In-to-Out Pass-Through (Time-to-Drain)
-* **Concept**: A mule account rarely holds illicit funds for long; money is immediately moved out.
+### 1. Rapid In-to-Out Pass-Through Mule (`RAPID_PASS_THROUGH_MULE`)
+* **Concept**: Captures the temporal signature of a pass-through laundering account where funds arrive and are immediately drained.
 * **Formulas**:
-  $$\text{Time to Drain} = t_{\text{debit}} - t_{\text{credit}}$$
-  $$\text{Drain Ratio} = \left(\frac{\text{Debit Amount}}{\text{Credit Inflow Amount}}\right) \times 100$$
-* **Thresholds**:
-  * Flagged if: $\text{Time to Drain} \le 60\text{ seconds}$ AND $\text{Drain Ratio} \ge 70\%$.
-  * Severity:
-    * $\text{CRITICAL}$ if $\text{Time to Drain} \le 15\text{ seconds}$.
-    * $\text{HIGH}$ if $15\text{ seconds} < \text{Time to Drain} \le 60\text{ seconds}$.
-  * Risk Score:
-    $$\text{Risk Score} = \min\left(99, 75 + (60 - \text{Time to Drain}) \times 0.4\right)$$
+  $$\Delta t = t_{\text{debit}} - t_{\text{credit}}$$
+  $$\text{Drain Ratio } (\%) = \left(\frac{\text{Amount}_{\text{debit}}}{\sum \text{Amount}_{\text{credit}}}\right) \times 100$$
+* **Thresholds**: $\Delta t \le 120\text{s}$, $\text{Drain Ratio} \ge 70\%$, $\text{Amount} \ge ₹5,000$.
+* **Severity**: $\text{CRITICAL}$ if $\Delta t \le 20\text{s}$, otherwise $\text{HIGH}$.
 
-### 2. Fan-In Smurfing Aggregator
-* **Concept**: A central fraud account collects small transfers from multiple compromised victims to evade single-transaction threshold limits.
-* **Condition**: $\ge 3$ distinct remitter accounts transferring money to the same beneficiary account within a 120-second sliding window.
+### 2. Fan-In Smurfing Aggregator (`FAN_IN_SMURFING_AGGREGATOR`)
+* **Concept**: Detects accounts aggregating funds from multiple distinct remitter victims to avoid single-transaction threshold reporting.
+* **Thresholds**: $\ge 3$ distinct remitter accounts transferring money to the same beneficiary within a 120-second sliding window.
 
-### 3. Multi-Hop Layering Chain
-* **Concept**: Funds move along an $A \to B \to C \to D$ path across multiple banks within minutes to obfuscate tracking.
-* **Condition**: $\text{Beneficiary}(T_x) = \text{Remitter}(T_{x+1})$ within a 30-second correlation window.
+### 3. Fan-Out Distribution Dispersal (`FAN_OUT_DISTRIBUTION`)
+* **Concept**: Identifies a primary distributor dispersing money across multiple runners within a tight timeframe.
+* **Thresholds**: 1 remitter dispersing funds to $\ge 3$ distinct beneficiaries within a 120-second window.
+
+### 4. Multi-Hop Layering Chain (`MULTI_HOP_LAYERING`)
+* **Concept**: Tracks money movements across consecutive intermediary accounts ($A \to B \to C \to D$).
+* **Thresholds**: Hop depth $\ge 3$ with transfer velocity between consecutive hops $\le 180$ seconds.
+
+### 5. Circular Transaction Loop (`CIRCULAR_TRANSACTION_LOOP`)
+* **Concept**: Identifies circular money laundering or wash trading where funds return to the originator ($A \to B \to C \to A$).
+* **Thresholds**: Cycle detected in directed transaction graph with hop depth between 3 and 4.
+
+### 6. Structuring & Transaction Splitting (`STRUCTURING_SPLIT`)
+* **Concept**: Multiple transactions executed just below the ₹50,000 regulatory reporting threshold within a short time interval.
+* **Thresholds**: $\ge 3$ transactions between ₹25,000 and ₹49,999 from the same account within 60 seconds.
 
 ---
 
-## 🚀 7. How to Run the Project (Step-by-Step)
+## ⚖️ 6. Explainable Risk Scoring Engine
 
-### Option A: Run the Live Web Dashboard
-```powershell
-node web-dashboard/server.js
-```
-Then open **`http://localhost:3000`** in your browser. You will see:
-* **Enterprise Banking & SOC Design**: Executive layout with clean financial risk cards, zero visual clutter, and high data density.
-* **Light / Dark Theme Toggle**: Click the theme button in the top right to switch between **Clean Light Mode** (default) and **Enterprise Dark Mode** with instant local persistence.
-* **Live Ingestion**: Transactions from `data/transactions.csv` streaming live in the transaction ledger.
-* **Automated Mule Detection**: Real-time money mule alerts appearing automatically in the left surveillance panel.
-* **Audit Trail Flow**: Step-by-step visual money routing ($Remitter \to Suspect Mule \to Destination$) with exact velocity metrics ($\text{Time to Drain}$ and $\text{Drain Ratio}$).
-* **Attack Simulation**: Click **"Simulate Attack"** to inject a live multi-hop laundering attack into the stream.
+Every alert is assigned an explainable score between **0 and 100** based on transparent contributing signals:
 
-### Option B: Run the Dataset Scanner Directly
-```powershell
-node ingestion/dataset_streamer.js data/transactions.csv
+$$R_{\text{total}} = \min\left(99, R_{\text{base}} + S_{\text{velocity}} + S_{\text{drain}} + S_{\text{degree}} + S_{\text{layering}} + S_{\text{value}} + S_{\text{history}}\right)$$
+
+| Signal | Max Weight | Condition & Points Allocation |
+| :--- | :--- | :--- |
+| **`RULE_TRIGGER_BASE`** | Base | **+40 pts** Baseline rule trigger |
+| **`VELOCITY_PENALTY`** | Up to +25% | $\le 10$s: **+25 pts** \| $\le 30$s: **+20 pts** \| $\le 60$s: **+15 pts** \| $\le 120$s: **+10 pts** |
+| **`DRAIN_RATIO_WEIGHT`**| Up to +20% | $\ge 95\%$: **+20 pts** \| $\ge 85\%$: **+15 pts** \| $\ge 70\%$: **+10 pts** |
+| **`NETWORK_CENTRALITY`**| Up to +20% | Degree $\ge 6$: **+20 pts** \| $\ge 4$: **+15 pts** \| $\ge 3$: **+10 pts** |
+| **`MULTI_HOP_LAYERING`**| Up to +15% | +5 pts per hop above 2 (up to +15 pts) |
+| **`CIRCULAR_LOOP`** | Up to +15% | **+15 pts** if directed cycle detected |
+| **`HIGH_VALUE_EXPOSURE`**| Up to +10% | $\ge ₹1,00,000$: **+10 pts** \| $\ge ₹50,000$: **+5 pts** |
+| **`RECIDIVISM_HISTORY`**| Up to +10% | +3 pts per previous alert (up to +10 pts) |
+| **`QUARANTINE_OVERRIDE`**| Critical | **+10 pts** if under active quarantine |
+
+---
+
+## 🕸️ 7. Interactive Money Flow Network Visualizer
+
+Implemented in pure HTML5 Canvas (`web-dashboard/public/app.js`):
+- **Force-Directed Layout**: Computes dynamic node positioning with collision detection and spring attraction along edges.
+- **Node Classification & Visual Styling**:
+  - `Normal Account`: Sky Blue (`#38bdf8`)
+  - `Aggregator (Smurfing)`: Amber (`#f59e0b`)
+  - `Dispersal (Fan-Out)`: Cyan (`#06b6d4`)
+  - `Mule Account`: Red (`#ef4444`)
+  - `Critical Threat`: Crimson (`#ff1744`)
+  - `Quarantined Account`: Purple (`#a855f7`)
+- **Directed Edges**: Curved arrows with thickness proportional to transaction value and animated direction vectors.
+- **Interactive Controls**: Pan, zoom (wheel), node drag, and click-to-inspect opening the Account Dossier.
+- **Topological Analysis**: "Highlight Chains" and "Detect Cycles" buttons for instant visual threat identification.
+
+---
+
+## 🔍 8. SOC Investigation & Case Management Workflow
+
+```mermaid
+stateDiagram-v2
+    [*] --> NEW: Fraud Rule Triggered
+    NEW --> INVESTIGATING: Analyst Begins Audit
+    INVESTIGATING --> QUARANTINED: High Confidence Mule
+    INVESTIGATING --> ESCALATED: Forward to Financial Crime Unit
+    INVESTIGATING --> RESOLVED: Verified Legitimate / Resolved
+    ESCALATED --> RESOLVED: Legal Action Completed
+    QUARANTINED --> RESOLVED: Account Frozen Permanently
+    RESOLVED --> [*]
 ```
-This processes all 9,000+ transactions, identifies the mule networks, and outputs a complete report to `data/alerts_output.json`.
+
+---
+
+## 🧪 9. Simulation Lab & Synthetic Attack Vectors
+
+The Simulation Lab (`engine/simulator.js`) provides 6 repeatable real-world financial attack scenarios:
+
+1. **Rapid Pass-Through**: Victim remits ₹75,000 to Mule Tier-1; Mule drains ₹72,000 (96%) in 3.5 seconds to a P2P crypto desk.
+2. **Fan-In Smurfing**: 4 victims remit ₹32,000–₹45,000 to 1 central aggregator who drains ₹1,48,000 in bulk to a hawala syndicate.
+3. **Fan-Out Distribution**: Distributor receives ₹1,80,000 and disperses ₹43,000–₹46,000 across 4 distinct runner accounts.
+4. **Multi-Hop Layering**: 4-hop chain (Victim $\to$ Mule 1 $\to$ Mule 2 $\to$ Mule 3 $\to$ Gold Bullion Vault).
+5. **Circular Transaction Loop**: Closed wash-trading loop ($A \to B \to C \to A$) between 3 synthetic corporate accounts.
+6. **Structuring Attack**: 4 rapid transactions between ₹47,000 and ₹49,500 within 40 seconds to evade the ₹50,000 reporting limit.
+
+---
+
+## 📡 10. REST & Streaming API Reference
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/stream` | `GET (SSE)` | Server-Sent Events stream emitting `transaction`, `alert`, and `case` payloads |
+| `/api/stats` | `GET` | Real-time KPIs (Total transactions, volume, alerts, active mules, TPS, latency) |
+| `/api/transactions` | `GET` | Query transactions (`?limit=50&status=SUCCESS&q=keyword`) |
+| `/api/alerts` | `GET` | Query alerts (`?limit=50&rule=RULE_CODE&severity=CRITICAL`) |
+| `/api/cases` | `GET` | Retrieve list of all SOC investigation cases |
+| `/api/cases/status` | `POST` | Update case status (`{ caseId, status, analyst, comment }`) |
+| `/api/cases/note` | `POST` | Add investigator note (`{ caseId, author, text }`) |
+| `/api/account/:vpa` | `GET` | 360-degree forensic dossier for specified VPA |
+| `/api/account/:vpa/quarantine` | `POST` | Toggle quarantine status (`{ reason, analyst }`) |
+| `/api/network/graph` | `GET` | Cytoscape/Canvas graph data (`?focus=vpa&limit=70`) |
+| `/api/analytics` | `GET` | Aggregated analytics (bank risk, geographic concentration, rule counts) |
+| `/api/simulate/:scenario` | `GET/POST` | Trigger synthetic attack scenario |
+| `/api/speed` | `GET` | Adjust stream replay speed (`?val=1x\|5x\|20x\|50x`) |
+| `/api/stream/pause` | `POST` | Pause real-time transaction ingestion |
+| `/api/stream/resume` | `POST` | Resume real-time transaction ingestion |
+| `/api/stream/reset` | `POST` | Reset in-memory transactions, graph, and alert state |
+| `/api/export` | `GET` | Export forensic report (`?format=json\|csv`) |
+
+---
+
+## 🛠️ 11. Testing & Verification
+
+Sentinel includes two automated verification test suites:
+
+```powershell
+# 1. Verify Rules, Scoring Model & Graph Algorithms (7/7 Pass)
+node tests/test_detection_engine.js
+
+# 2. Verify Server Routes, APIs & Scenario Triggers (9/9 Pass)
+node tests/test_server_mock.js
+```
+
+---
+
+## 🚀 12. Step-by-Step Demonstration Script
+
+For evaluations, technical interviews, or presentations:
+
+1. **Launch the Platform**:
+   ```powershell
+   node web-dashboard/server.js
+   ```
+   Open `http://localhost:3000`.
+2. **Show Command Center**: Highlight the live TPS (2.5/s), sub-millisecond CEP latency, rolling throughput chart, and executive metrics.
+3. **Demonstrate Stream Ledger**: Switch to **Live Transactions**, filter by `₹40k+ High Value`, and show real-time ingestion.
+4. **Trigger Live Attack in Simulation Lab**: Switch to **Simulation Lab**, click **"Inject Attack"** on *Rapid Pass-Through* or *Fan-In Smurfing*.
+5. **Inspect the Resulting Alert**: Switch to **Fraud Alerts** to show the newly detected threat, demonstrating the exact $\text{Time to Drain}$ and explainable signal points (+25 pts velocity, +20 pts drain ratio).
+6. **Open Network Intelligence**: View the nodes on the **Network Intelligence** graph. Drag nodes, zoom in, and click "Detect Cycles" or "Highlight Chains".
+7. **Conduct Account Investigation**: Click any suspect VPA to open the **Account 360 Dossier**. Click **"Quarantine Account"** to demonstrate live policy enforcement, and transition the case status from `NEW` to `INVESTIGATING` to `RESOLVED`.
+8. **Export Evidence**: Switch to **Analytics & Reports** and click **"Download Forensic JSON"** to demonstrate compliance export readiness.
