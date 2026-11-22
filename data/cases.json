@@ -1,0 +1,838 @@
+[
+  {
+    "caseId": "CASE-0001-44823",
+    "alertId": "ALT-0001-44823",
+    "suspectVpa": "7683454560@okaxis",
+    "suspectName": "Mehul Sankaran",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "HIGH",
+    "riskScore": 75,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 12.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 10,
+        "weight": "20%",
+        "description": "Substantial liquidation: 84.5% drained (≥ 70%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹62,000"
+      }
+    ],
+    "amountDrained": 62000,
+    "bank": "AXIS",
+    "location": "Delhi",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:52:24.827Z",
+    "updatedAt": "2026-11-17T12:52:24.827Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:52:24.827Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0001-44823 triggered rule RAPID_PASS_THROUGH_MULE with risk score 75/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0002-45228",
+    "alertId": "ALT-0002-45228",
+    "suspectVpa": "2246623650@okaxis",
+    "suspectName": "Rhea Kothari",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 85,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 14.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 96.0% drained (≥ 95%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹59,500"
+      }
+    ],
+    "amountDrained": 59500,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:52:25.228Z",
+    "updatedAt": "2026-11-17T12:52:25.228Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:52:25.228Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0002-45228 triggered rule RAPID_PASS_THROUGH_MULE with risk score 85/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0003-45228",
+    "alertId": "ALT-0003-45228",
+    "suspectVpa": "2246623650@okaxis",
+    "suspectName": "Rhea Kothari",
+    "ruleCode": "MULTI_HOP_LAYERING",
+    "severity": "HIGH",
+    "riskScore": 78,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for MULTI_HOP_LAYERING"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 26.0s (≤ 30s)"
+      },
+      {
+        "signal": "MULTI_HOP_LAYERING",
+        "points": 10,
+        "weight": "15%",
+        "description": "Deep layering detected across 3 successive hops"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹59,500"
+      },
+      {
+        "signal": "RECIDIVISM_HISTORY",
+        "points": 3,
+        "weight": "10%",
+        "description": "Account has 1 previous fraud alert(s)"
+      }
+    ],
+    "amountDrained": 59500,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:52:25.229Z",
+    "updatedAt": "2026-11-17T12:52:25.229Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:52:25.229Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0003-45228 triggered rule MULTI_HOP_LAYERING with risk score 78/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0004-46450",
+    "alertId": "ALT-0004-46450",
+    "suspectVpa": "vikram_mule@okhdfcbank",
+    "suspectName": "Vikram Roy (Mule Aggregator)",
+    "ruleCode": "FAN_IN_SMURFING_AGGREGATOR",
+    "severity": "MEDIUM",
+    "riskScore": 60,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for FAN_IN_SMURFING_AGGREGATOR"
+      },
+      {
+        "signal": "NETWORK_CENTRALITY",
+        "points": 10,
+        "weight": "20%",
+        "description": "Multi-party fan pattern: 3 counter-parties connected"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 10,
+        "weight": "10%",
+        "description": "High financial volume: ₹1,09,000"
+      }
+    ],
+    "amountDrained": 109000,
+    "bank": "ICICI",
+    "location": "Delhi",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:52:26.451Z",
+    "updatedAt": "2026-11-17T12:52:26.451Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:52:26.451Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0004-46450 triggered rule FAN_IN_SMURFING_AGGREGATOR with risk score 60/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0005-47263",
+    "alertId": "ALT-0005-47263",
+    "suspectVpa": "vikram_mule@okhdfcbank",
+    "suspectName": "Vikram Roy (Mule Aggregator)",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 99,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 28.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 97.4% drained (≥ 95%)"
+      },
+      {
+        "signal": "NETWORK_CENTRALITY",
+        "points": 15,
+        "weight": "20%",
+        "description": "Elevated network cardinality: 4 counter-parties connected"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 10,
+        "weight": "10%",
+        "description": "High financial volume: ₹1,50,000"
+      },
+      {
+        "signal": "RECIDIVISM_HISTORY",
+        "points": 3,
+        "weight": "10%",
+        "description": "Account has 1 previous fraud alert(s)"
+      }
+    ],
+    "amountDrained": 150000,
+    "bank": "HDFCBANK",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:52:27.263Z",
+    "updatedAt": "2026-11-17T12:52:27.263Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:52:27.263Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0005-47263 triggered rule RAPID_PASS_THROUGH_MULE with risk score 99/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0001-00320",
+    "alertId": "ALT-0001-00320",
+    "suspectVpa": "7683454560@okaxis",
+    "suspectName": "Mehul Sankaran",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "HIGH",
+    "riskScore": 75,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 12.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 10,
+        "weight": "20%",
+        "description": "Substantial liquidation: 84.5% drained (≥ 70%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹62,000"
+      }
+    ],
+    "amountDrained": 62000,
+    "bank": "AXIS",
+    "location": "Delhi",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:20.323Z",
+    "updatedAt": "2026-11-17T12:53:20.323Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:20.323Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0001-00320 triggered rule RAPID_PASS_THROUGH_MULE with risk score 75/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0002-00721",
+    "alertId": "ALT-0002-00721",
+    "suspectVpa": "2246623650@okaxis",
+    "suspectName": "Rhea Kothari",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 85,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 14.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 96.0% drained (≥ 95%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹59,500"
+      }
+    ],
+    "amountDrained": 59500,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:20.721Z",
+    "updatedAt": "2026-11-17T12:53:20.721Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:20.721Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0002-00721 triggered rule RAPID_PASS_THROUGH_MULE with risk score 85/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0003-00721",
+    "alertId": "ALT-0003-00721",
+    "suspectVpa": "2246623650@okaxis",
+    "suspectName": "Rhea Kothari",
+    "ruleCode": "MULTI_HOP_LAYERING",
+    "severity": "HIGH",
+    "riskScore": 78,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for MULTI_HOP_LAYERING"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 26.0s (≤ 30s)"
+      },
+      {
+        "signal": "MULTI_HOP_LAYERING",
+        "points": 10,
+        "weight": "15%",
+        "description": "Deep layering detected across 3 successive hops"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹59,500"
+      },
+      {
+        "signal": "RECIDIVISM_HISTORY",
+        "points": 3,
+        "weight": "10%",
+        "description": "Account has 1 previous fraud alert(s)"
+      }
+    ],
+    "amountDrained": 59500,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:20.722Z",
+    "updatedAt": "2026-11-17T12:53:20.722Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:20.722Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0003-00721 triggered rule MULTI_HOP_LAYERING with risk score 78/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0004-01930",
+    "alertId": "ALT-0004-01930",
+    "suspectVpa": "vikram_mule@okhdfcbank",
+    "suspectName": "Vikram Roy (Mule Aggregator)",
+    "ruleCode": "FAN_IN_SMURFING_AGGREGATOR",
+    "severity": "MEDIUM",
+    "riskScore": 60,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for FAN_IN_SMURFING_AGGREGATOR"
+      },
+      {
+        "signal": "NETWORK_CENTRALITY",
+        "points": 10,
+        "weight": "20%",
+        "description": "Multi-party fan pattern: 3 counter-parties connected"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 10,
+        "weight": "10%",
+        "description": "High financial volume: ₹1,09,000"
+      }
+    ],
+    "amountDrained": 109000,
+    "bank": "ICICI",
+    "location": "Delhi",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:21.930Z",
+    "updatedAt": "2026-11-17T12:53:21.930Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:21.930Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0004-01930 triggered rule FAN_IN_SMURFING_AGGREGATOR with risk score 60/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0005-02741",
+    "alertId": "ALT-0005-02741",
+    "suspectVpa": "vikram_mule@okhdfcbank",
+    "suspectName": "Vikram Roy (Mule Aggregator)",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 99,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 28.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 97.4% drained (≥ 95%)"
+      },
+      {
+        "signal": "NETWORK_CENTRALITY",
+        "points": 15,
+        "weight": "20%",
+        "description": "Elevated network cardinality: 4 counter-parties connected"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 10,
+        "weight": "10%",
+        "description": "High financial volume: ₹1,50,000"
+      },
+      {
+        "signal": "RECIDIVISM_HISTORY",
+        "points": 3,
+        "weight": "10%",
+        "description": "Account has 1 previous fraud alert(s)"
+      }
+    ],
+    "amountDrained": 150000,
+    "bank": "HDFCBANK",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:22.742Z",
+    "updatedAt": "2026-11-17T12:53:22.742Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:22.742Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0005-02741 triggered rule RAPID_PASS_THROUGH_MULE with risk score 99/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0001-31232",
+    "alertId": "ALT-0001-31232",
+    "suspectVpa": "7683454560@okaxis",
+    "suspectName": "Mehul Sankaran",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "HIGH",
+    "riskScore": 75,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 12.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 10,
+        "weight": "20%",
+        "description": "Substantial liquidation: 84.5% drained (≥ 70%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹62,000"
+      }
+    ],
+    "amountDrained": 62000,
+    "bank": "AXIS",
+    "location": "Delhi",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:51.235Z",
+    "updatedAt": "2026-11-17T12:53:51.235Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:51.235Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0001-31232 triggered rule RAPID_PASS_THROUGH_MULE with risk score 75/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0002-31646",
+    "alertId": "ALT-0002-31646",
+    "suspectVpa": "2246623650@okaxis",
+    "suspectName": "Rhea Kothari",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 85,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 14.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 96.0% drained (≥ 95%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹59,500"
+      }
+    ],
+    "amountDrained": 59500,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:51.647Z",
+    "updatedAt": "2026-11-17T12:53:51.647Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:51.647Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0002-31646 triggered rule RAPID_PASS_THROUGH_MULE with risk score 85/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0003-31646",
+    "alertId": "ALT-0003-31646",
+    "suspectVpa": "2246623650@okaxis",
+    "suspectName": "Rhea Kothari",
+    "ruleCode": "MULTI_HOP_LAYERING",
+    "severity": "HIGH",
+    "riskScore": 78,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for MULTI_HOP_LAYERING"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 26.0s (≤ 30s)"
+      },
+      {
+        "signal": "MULTI_HOP_LAYERING",
+        "points": 10,
+        "weight": "15%",
+        "description": "Deep layering detected across 3 successive hops"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹59,500"
+      },
+      {
+        "signal": "RECIDIVISM_HISTORY",
+        "points": 3,
+        "weight": "10%",
+        "description": "Account has 1 previous fraud alert(s)"
+      }
+    ],
+    "amountDrained": 59500,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:51.647Z",
+    "updatedAt": "2026-11-17T12:53:51.647Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:51.647Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0003-31646 triggered rule MULTI_HOP_LAYERING with risk score 78/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0004-32863",
+    "alertId": "ALT-0004-32863",
+    "suspectVpa": "vikram_mule@okhdfcbank",
+    "suspectName": "Vikram Roy (Mule Aggregator)",
+    "ruleCode": "FAN_IN_SMURFING_AGGREGATOR",
+    "severity": "MEDIUM",
+    "riskScore": 60,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for FAN_IN_SMURFING_AGGREGATOR"
+      },
+      {
+        "signal": "NETWORK_CENTRALITY",
+        "points": 10,
+        "weight": "20%",
+        "description": "Multi-party fan pattern: 3 counter-parties connected"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 10,
+        "weight": "10%",
+        "description": "High financial volume: ₹1,09,000"
+      }
+    ],
+    "amountDrained": 109000,
+    "bank": "ICICI",
+    "location": "Delhi",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:52.863Z",
+    "updatedAt": "2026-11-17T12:53:52.863Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:52.863Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0004-32863 triggered rule FAN_IN_SMURFING_AGGREGATOR with risk score 60/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0005-33686",
+    "alertId": "ALT-0005-33686",
+    "suspectVpa": "vikram_mule@okhdfcbank",
+    "suspectName": "Vikram Roy (Mule Aggregator)",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 99,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 28.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 97.4% drained (≥ 95%)"
+      },
+      {
+        "signal": "NETWORK_CENTRALITY",
+        "points": 15,
+        "weight": "20%",
+        "description": "Elevated network cardinality: 4 counter-parties connected"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 10,
+        "weight": "10%",
+        "description": "High financial volume: ₹1,50,000"
+      },
+      {
+        "signal": "RECIDIVISM_HISTORY",
+        "points": 3,
+        "weight": "10%",
+        "description": "Account has 1 previous fraud alert(s)"
+      }
+    ],
+    "amountDrained": 150000,
+    "bank": "HDFCBANK",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:53:53.686Z",
+    "updatedAt": "2026-11-17T12:53:53.686Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:53:53.686Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0005-33686 triggered rule RAPID_PASS_THROUGH_MULE with risk score 99/100"
+      }
+    ],
+    "notes": []
+  },
+  {
+    "caseId": "CASE-0006-84010",
+    "alertId": "ALT-0006-84010",
+    "suspectVpa": "mule_sharma@okaxis",
+    "suspectName": "Aman Sharma (Mule Tier-1)",
+    "ruleCode": "RAPID_PASS_THROUGH_MULE",
+    "severity": "CRITICAL",
+    "riskScore": 85,
+    "riskBreakdown": [
+      {
+        "signal": "RULE_TRIGGER_BASE",
+        "points": 40,
+        "weight": "Base",
+        "description": "Baseline rule invocation for RAPID_PASS_THROUGH_MULE"
+      },
+      {
+        "signal": "VELOCITY_PENALTY",
+        "points": 20,
+        "weight": "25%",
+        "description": "High velocity: funds drained in 14.0s (≤ 30s)"
+      },
+      {
+        "signal": "DRAIN_RATIO_WEIGHT",
+        "points": 20,
+        "weight": "20%",
+        "description": "Complete liquidation: 95.8% drained (≥ 95%)"
+      },
+      {
+        "signal": "HIGH_VALUE_EXPOSURE",
+        "points": 5,
+        "weight": "10%",
+        "description": "High financial volume: ₹69,000"
+      }
+    ],
+    "amountDrained": 69000,
+    "bank": "PAYTM",
+    "location": "Mumbai",
+    "status": "NEW",
+    "assignedAnalyst": "SOC Analyst",
+    "createdAt": "2026-11-17T12:56:24.010Z",
+    "updatedAt": "2026-11-17T12:56:24.010Z",
+    "timeline": [
+      {
+        "timestamp": "2026-11-17T12:56:24.010Z",
+        "type": "ALERT_TRIGGERED",
+        "message": "Alert ALT-0006-84010 triggered rule RAPID_PASS_THROUGH_MULE with risk score 85/100"
+      }
+    ],
+    "notes": []
+  }
+]
